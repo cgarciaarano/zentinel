@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>SMS Subscriber</h1>
+<div class="btn-group" data-toggle="buttons-radio">
+  <form name="date_filter" action={{ url_for('index') }} method="post">
+
+      {% for index,filter in filters %}
+      <button type="submit" name="date_filter" value="{{ index }}" class="btn {{ 'btn-primary' if selected == index }}">{{ filter[2] }}</button>
+      {% endfor %}
+      
+      <input type="hidden" id="timezone" name="timezone"/>
+      <script language="javascript">
+        var timezone = jstz.determine();
+        document.getElementById("timezone").value = timezone.name();
+      </script>
+      
+  <form>
+</div>
+<table class="table table-striped table-condensed table-bordered">
+<tr>
+	<th>Creation Date</th>
+	<th>Number</th>
+	<th>Pin</th>
+	<th>Sent</th>
+	<th>Confirmed</th>
+	<th>DLR Code</th>
+  <th>Id</th>
+</tr>
+{% for sms in smss.items %}
+<tr>
+	<td>{{momentjs(sms.creation_time).format("DD-MM-YYYY HH:mm:ss")}}</td>
+	<td>{{sms.number}}</td>
+	<td>{{sms.pin}}</td>
+	<td>{{sms.sent}}</td>
+	<td>{{sms.confirmed}}</td>
+	<td>{{sms.dlr_code}}</td>
+  <td>{{sms.id}}</td>
+</tr>
+{% endfor %}
+</table>
+
+<div class="pagination">
+  <ul>
+  	{% if smss.has_prev %}
+  		<li><a href="{{ url_for('index', page = smss.prev_num) }}">Prev</a></li>
+  	{% else %}
+  		<li class="disabled"><a href="#">Prev</a></li>
+  	{% endif %}
+  	
+  	{% for page in smss.iter_pages() %}
+  		{% if page %}
+  			{% if page != smss.page %}
+  				<li><a href="{{ url_for('index', page = page) }}">{{ page }}</a></li>
+  			{% else %}
+  				<li><a href="#"><strong>{{ page}}</strong></a></li>
+  			{% endif %}
+  		{% else %}
+  		<li><a href="#">...</a></li>
+  		{% endif %}
+  	{% endfor %}
+
+  	{% if smss.has_next %}
+  		<li><a href="{{ url_for('index', page = smss.next_num) }}">Next</a></li>
+  	{% else %}
+  		<li class="disabled"><a href="#">Next</a></li>
+  	{% endif %} 
+  </ul> 	
+</div>
+{% endblock %}

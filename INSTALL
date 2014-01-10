@@ -1,0 +1,15 @@
+* PREREQUISITES
+*
+* MySQL
+* Kannel
+
+INSTALLATION
+* Checkout project
+* Try virtualenv.py --relocatable env/
+* If it doesn't work, recreate virtualenv 
+	rm -rf env/
+	virtualenv.py  env/
+	env/bin/pip -r requirements.txt
+
+* Configuration
+	Don't forget to put correct values to IPADDR and PORT. These are used to craft the DLR URL
