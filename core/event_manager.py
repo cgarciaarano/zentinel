@@ -18,22 +18,15 @@ import time
 import logging
 import signal
 import traceback
+import sys
 #import ujson
 from rq import Queue
 
-sys.path.insert(0, '../')
 
-import web.settings
-setup_environ(web.settings)
+
 
 logger = logging.getLogger('web')
 
-parser = OptionParser(description='Startup options')
-# parser.add_option('--redis','-r',dest='redisIP',help='Redis server IP Address',metavar='REDIS',default='192.168.0.98')
-parser.add_option('--redis','-r',dest='redisIP',help='Redis server IP Address',metavar='REDIS',default=web.settings.REDIS_IP)
-parser.add_option('--redisdb','-d',dest='redisDB',help='Redis server DB',metavar='REDIS_DB',default=.settings.REDIS_DB)
-
-(options, args) = parser.parse_args()
 
 CONSUMED_EVENTS = 'CONSUMED_EVENTS'
 
@@ -63,7 +56,7 @@ class EventManager():
 			action = self.current_event.get_action()
 
 			logger.info("Event processed in {0} seconds".format(time.time()-t0))
-			logger.debug("Action: {0}".format(action)
+			logger.debug("Action: {0}".format(action))
 
 			if action:
 				self.wqueue.enqueue(action.execute)

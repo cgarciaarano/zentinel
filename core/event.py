@@ -12,7 +12,6 @@ Event
 """
 import logging
 from datetime import datetime
-sys.path.insert(0, '../')
 
 logger = logging.getLogger('web')
 
