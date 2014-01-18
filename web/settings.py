@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # encoding: utf-8
 from logging.handlers import SysLogHandler 
-
+import logging.config
 
 import os
 import sys
@@ -24,6 +24,8 @@ USE_TZ = True
 APP_NAME = 'zentinel'
 REDIS_IP = 'localhost'
 REDIS_DB = 1
+REDIS_EQUEUE_IP = 'localhost'
+REDIS_EQUEUE_DB = 2
 REDIS_LT_PREFIX = 'LiveTraffic_{0}*'.format(APP_NAME)
 REDIS_LT_PREFIX_USR = 'User_LiveTraffic_{0}*'.format(APP_NAME)
 REDIS_PUB_SUB = 'LIVE_{0}*'.format(APP_NAME)
@@ -80,20 +82,10 @@ LOGGING = {
 	},
 	'filters': {},
 	'handlers': {
-		'null': {
-			'level':'DEBUG',
-			'class':'django.utils.log.NullHandler',
-		},
 		'console':{
 			'level':'DEBUG',
 			'class':'logging.StreamHandler',
 			'formatter': 'verbose'
-		},
-		'mail_admins': {
-			'level': 'ERROR',
-			'class': 'django.utils.log.AdminEmailHandler',
-            'formatter': 'verbose',
-			'filters': []
 		},
 	     'rsyslog1': {
             'level': 'DEBUG',
@@ -105,24 +97,14 @@ LOGGING = {
         },
 	},
 	'loggers': {
-		"rq.worker": {
+		"core": {
             "handlers": ['console',"rsyslog1"],
             "level": "DEBUG",
             "progagate": True,
         },
-		"ooint.international.jobs": {
-            "handlers": ['console',"rsyslog1"],
-            "level": "DEBUG",
-            "progagate": True,
-        },        
-		'django': {
-			'handlers':['null'],
-			'propagate': True,
-			'level':'INFO',
-		}
 	}
 }
-
+logging.config.dictConfig(LOGGING)
 
 
 RQ_QUEUES = {

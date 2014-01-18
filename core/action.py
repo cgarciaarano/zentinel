@@ -22,6 +22,7 @@ class Action(object):
 	Provides the attribs and public methods execute() and callback()
 	'''
 
+	# Creates attributes from dict and keywords. Flexible but obscure
 	def __init__(self, *event_dict, **kwargs):
 		for key in event_dict:
 			setattr(self, key, event_dict[key])
@@ -40,7 +41,7 @@ class Action(object):
 
 	@staticmethod
 	def subclass():
-		''' Returns a dict with subclasses names and subclasses instances.
+		''' Returns a dict with all subclasses names and instances.
 		P.e. {'SimpleCall': SimpleCall, 'AcknowledgedCall': AcknowledgedCall}.
 		Quite useful when adding Actions ;) '''
 		return dict((subclass.__name__, subclass) for subclass in Action.__subclasses__())
@@ -63,7 +64,7 @@ class Action(object):
 			q = EventQueue()
 			q.push_event(self.event)
 
-
+# Subclasses
 
 class SimpleCall(Action):
 	"""
@@ -74,11 +75,7 @@ class SimpleCall(Action):
 	def __init__(self, event, params=None):
 		Action.__init__(self, event)
 		self.action_type = self.__class__.__name__
-		self.params = {	ddi: None,
-						cli: None,
-						retries: 1,
-						duration:2,
-					}
+		self.params = params
 
 	def execute(self):
 		# Some blocking execution
@@ -101,6 +98,29 @@ class AcknoweledgedCall(Action):
 		self.params = {	ddi: None,
 						cli: None,
 						pin: None,
+					}
+
+	def execute(self):
+		# Some blocking execution
+		result = True 
+
+		self.callback(result)
+
+
+class AnnounceCall(Action):
+	"""
+	Represents an call through Asterisk that reads the message. 
+	"""
+	self.action_type = self.__class__.__name__
+	
+	def __init__(self, event, params=None):
+		Action.__init__(self, event)
+		self.action_type = self.__class__.__name__
+		self.params = {	ddi: None,
+						cli: None,
+						retries: None,
+						message: None,
+						language: None
 					}
 
 	def execute(self):

@@ -12,7 +12,6 @@ Event Manager
 """
 from event import Event
 from event_queue import EventQueue
-import redis
 from optparse import OptionParser
 import time
 import logging
@@ -21,11 +20,9 @@ import traceback
 import sys
 #import ujson
 from rq import Queue
+from redis import Redis
 
-
-
-
-logger = logging.getLogger('web')
+logger = logging.getLogger('core')
 
 
 CONSUMED_EVENTS = 'CONSUMED_EVENTS'
@@ -50,7 +47,7 @@ class EventManager():
 		
 		t0 = time.time()
 		logger.info("Waiting for events to arrive...")
-		self.current_event = equeue.pop_event()
+		self.current_event = self.equeue.pop_event()
 
 		try:
 			action = self.current_event.get_action()
@@ -62,7 +59,8 @@ class EventManager():
 				self.wqueue.enqueue(action.execute)
 			else:
 				pass
-				# Event discarded
+				# Log error
+				# Push again with step = 1
 
 		except Exception:
 			logger.error("Failed processing event: {0} Data is {1}".format(traceback.format_exc(),event))
@@ -86,18 +84,21 @@ def __signalHandler(signum, frame):
 	logger.debug("Caught signal" + str(signum))
 
 	try:
-		logger.error("Signal recived while inserting, sending data back to queue...")
+		if event_manager.current_event:
+			logger.error("Signal recived while inserting, sending data back to event queue...")
 
-		try:
-			event_manager.equeue.push_event(event_manager.current_event)			
-			logger.info("Data succesfully sent back to queue!")
-		except:
-			logger.debug("Something went wrong 1")
+			try:
+				event_manager.equeue.push_event(event_manager.current_event)			
+				logger.info("Data succesfully sent back to event queue!")
+			except:
+				logger.error("Can't insert back to event queue")
+				logger.error("Event: {0}".format(event_manager.current_event))
 
 	except:
-		logger.debug("Something went wrong 2 {0}".format(traceback.format_exc()))
+		logger.debug("Something went wrong {0}".format(traceback.format_exc()))
 	finally:
-		raise KeyboardInterrupt
+		logger.info("Exiting now")
+		sys.exit(0)
 
 
 
