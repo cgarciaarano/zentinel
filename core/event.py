@@ -33,6 +33,8 @@ class Event():
 		self.process_date = None
 		self.end_date = None
 		self.client = None
+		self.message = None
+		self.ip_addr = None
 		self.tag = None
 		self.step = None
 

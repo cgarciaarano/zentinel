@@ -14,11 +14,14 @@ from event import Event
 import logging
 import sys
 import time
+import redis
 
-logger = logging.getLogger('kk')
 sys.path.insert(0, '../')
-
 import web.settings
+
+logger = logging.getLogger('core')
+
+
 class EventQueue():
 	"""
 	Queue of events. It uses Redis as backend, and permits duplicated events.
@@ -36,7 +39,7 @@ class EventQueue():
 		while not got_redis and attempts < 10:
 			try:
 				logger.info("Trying Redis reconnection {0}...".format(attempts))
-				rds = redis.Redis(web.settings.REDIS_IP,db=web.settings.REDIS_DB)
+				rds = redis.Redis(web.settings.REDIS_EQUEUE_IP,db=web.settings.REDIS_EQUEUE_DB)
 				rds.llen(self.queue)
 				got_redis = True
 				logger.info("Redis connected!")
