@@ -36,9 +36,10 @@ class API(object):
 		# TODO Implement current_events in redis, so we can run multiple instances
 	
 	def get_clients(self):
-		return {'1':'Pepe',
-				'2':'Lucia',
-				'3':'David',
+		# TODO Implement a real lookup
+		return {'1':{'client': 'Carla', 'service':'SimpleCall'},
+				'2':{'client': 'Lucia', 'service':'AcknowledgedCall'},
+				'3':{'client': 'David', 'service':'AnnounceCall'},
 				}
 
 	def handle_event(self,data):
@@ -51,7 +52,7 @@ class API(object):
 		
 		# Check client
 		if data['client_key'] in self.get_clients().keys():
-			data['client'] = self.get_clients()[data['client_key']]
+			data['client'] = self.get_clients()[data['client_key']]['client']
 		else:
 			return (False,'Client does not exist')
 		
