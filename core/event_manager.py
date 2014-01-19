@@ -10,7 +10,7 @@ Event Manager
 
 @author Carlos Garcia <cgarciaarano@gmail.com>
 """
-from event import Event
+from models import Event
 from event_queue import EventQueue
 from optparse import OptionParser
 import time
@@ -40,7 +40,7 @@ class EventManager():
 
 	def setup_wqueue(self):
 		redis_conn = Redis()
-		q = Queue(connection=redis_conn)
+		return Queue(connection=redis_conn)
 	
 	def consume_queue(self):
 		''' Consumes an event and decides if it should be executed '''
@@ -63,13 +63,13 @@ class EventManager():
 				# Push again with step = 1
 
 		except Exception:
-			logger.error("Failed processing event: {0} Data is {1}".format(traceback.format_exc(),event))
+			logger.error("Failed processing event: {0} Data is {1}".format(traceback.format_exc(),self.current_event))
 			logger.error("Sending data back to queue...")
 			try:
 				equeue.push_event(self.current_event)
 				logger.info("Data succesfully sent back to queue!")
 			except:
-				logger.crit("Could not send data back to queue")
+				logger.critical("Could not send data back to queue")
 				sys.exit(-1)
 				
 		self.current_event = None
