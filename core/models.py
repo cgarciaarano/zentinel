@@ -2,19 +2,62 @@
 # encoding: utf-8
 
 """
-action.py
+models.py
 
-Action
+Event
 
 2014 Pogona 
 
 @author Carlos Garcia <cgarciaarano@gmail.com>
 """
 import logging
-from event_queue import EventQueue
+import time
 from datetime import datetime
+from event_queue import EventQueue
 
 logger = logging.getLogger('web')
+
+class Event():
+	"""
+	Represents a client event
+	"""
+
+	"""
+	def __init__(self, *event_dict, **kwargs):
+		for key in event_dict:
+			setattr(self, key, event_dict[key])
+		for key in kwargs:
+			setattr(self, key, kwargs[key])
+	"""
+	def __init__(self,data):
+		self.id = None
+		self.start_date = datetime.utcnow()
+		self.process_date = None
+		self.end_date = None
+		self.client = data['client']
+		self.message = data['message']
+		self.ip_addr = data['ip_addr']
+		self.tag = data['tag']
+		self.step = 1
+
+	def __str__(self):
+		return str(self.__dict__)
+
+	def get_data(self):
+		return str(self)		
+
+	def get_action(self):
+		# Check some service or whatever
+		# (action_type,params) = getActionTypeForThisEvent(self)
+		(action_type,params) = ('SimpleCall',{'ddi':695624167,'cli':666666666,'retries':3})
+		# Create object of type 'action_type'
+		action = Action.subclass()[action_type](self,params)
+
+		return action
+
+	def incr_step(self):
+		self.step += 1
+
 
 class Action(object):
 	''''
@@ -29,9 +72,10 @@ class Action(object):
 		for key in kwargs:
 			setattr(self, key, kwargs[key])
 
-	def __init__(self, event):
+	def __init__(self, event, params):
 		self.event = event
 		self.action_type = self.__class__.__name__
+		self.params = params
 
 	def __str__(self):
 		return str(self.__dict__)
@@ -73,13 +117,19 @@ class SimpleCall(Action):
 	Inherits from Action, so execute() and callback() are implemented.
 	"""
 	def __init__(self, event, params=None):
-		Action.__init__(self, event)
+		Action.__init__(self, event, params)
 		self.action_type = self.__class__.__name__
-		self.params = params
 
 	def execute(self):
+		import random
 		# Some blocking execution
-		result = True 
+		time.sleep(5)
+		if random.random() > 0.5:
+			print 'True'
+			result = True
+		else:
+			print 'False'
+			result = False  
 
 		self.callback(result)
 
@@ -90,18 +140,13 @@ class AcknoweledgedCall(Action):
 	Place a call to 'ddi' from 'cli' until the called party sends back 'pin' through DTMF, and retries 'retries' times
 	Inherits from Action, so execute() and callback() are implemented.
 	"""
-	self.action_type = self.__class__.__name__
-	
 	def __init__(self, event, params=None):
-		Action.__init__(self, event)
+		Action.__init__(self, event, params)
 		self.action_type = self.__class__.__name__
-		self.params = {	ddi: None,
-						cli: None,
-						pin: None,
-					}
 
 	def execute(self):
 		# Some blocking execution
+		time.sleep(10)
 		result = True 
 
 		self.callback(result)
@@ -111,20 +156,13 @@ class AnnounceCall(Action):
 	"""
 	Represents an call through Asterisk that reads the message. 
 	"""
-	self.action_type = self.__class__.__name__
-	
 	def __init__(self, event, params=None):
-		Action.__init__(self, event)
+		Action.__init__(self, event, params)
 		self.action_type = self.__class__.__name__
-		self.params = {	ddi: None,
-						cli: None,
-						retries: None,
-						message: None,
-						language: None
-					}
 
 	def execute(self):
 		# Some blocking execution
+		sys.sleep(10)
 		result = True 
 
 		self.callback(result)

@@ -38,6 +38,7 @@ def setup_system():
 def configure_system():
 	install_redis()
 	package_update()
+	package_ensure('curl')
 	package_ensure('asterisk')
 
 # Application stuff
@@ -55,6 +56,7 @@ def python_requisites():
 	# This should be in requisites.txt
 	python_package_ensure_pip('redis')
 	python_package_ensure_pip('rq')
+	python_package_ensure_pip('Flask')
 
 def prerequisites():
 	package_ensure('python-dev')

@@ -10,11 +10,12 @@ Event Queue
 
 @author Carlos Garcia <cgarciaarano@gmail.com>
 """
-from event import Event
+import models
 import logging
 import sys
 import time
 import redis
+import datetime
 
 sys.path.insert(0, '../')
 import web.settings
@@ -30,6 +31,7 @@ class EventQueue():
 	def __init__(self):
 		self.queue = 'EVENT_QUEUE'
 		self.redis = self.redis_connect()
+		self.redis.set(web.settings.CONSUMED_EVENTS,0)
 
 	def redis_connect(self):
 		''' Reconnects to Redis and returns an active connection. Exits the program if it can't '''
@@ -60,18 +62,18 @@ class EventQueue():
 			event = self.redis.blpop(self.queue)[1]
 
 			event = eval(event)
-			total = self.backend.incr(CONSUMED_EVENTS,1) # Increment in redis the number of events consumed 
+			total = self.redis.incr(web.settings.CONSUMED_EVENTS,1) # Increment in redis the number of events consumed 
 			logger.debug("Total events consumed {0}, processing...".format(total))
 		except redis.ConnectionError:
 			pass
 
-		return Event(event)
+		return models.Event(event)
 
 	def push_event(self, event):
 		try:
 			rpipe = self.redis.pipeline()
 			rpipe.rpush(self.queue,str(event))
-			rpipe.decr(CONSUMED_EVENTS,1) # Decrement in redis the number of NCDRs consumed
+			rpipe.decr(web.settings.CONSUMED_EVENTS,1) # Decrement in redis the number of NCDRs consumed
 			rpipe.execute()
 			self.current_event = None
 		except redis.ConnectionError:
