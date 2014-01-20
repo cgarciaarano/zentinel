@@ -14,7 +14,7 @@ import models
 import logging
 import sys
 import time
-import redis
+import redis 
 import datetime
 
 sys.path.insert(0, '../')
@@ -40,8 +40,8 @@ class EventQueue():
 		
 		while not got_redis and attempts < 10:
 			try:
-				logger.info("Trying Redis reconnection {0}...".format(attempts))
-				rds = redis.Redis(web.settings.REDIS_EQUEUE_IP,db=web.settings.REDIS_EQUEUE_DB)
+				logger.info("Trying Redis connection {0}...".format(attempts))
+				rds = redis.StrictRedis(connection_pool=web.settings.REDIS_POOL)
 				rds.llen(self.queue)
 				got_redis = True
 				logger.info("Redis connected!")

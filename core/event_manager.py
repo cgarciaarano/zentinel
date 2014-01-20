@@ -20,7 +20,10 @@ import traceback
 import sys
 #import ujson
 from rq import Queue
-from redis import Redis
+from redis import StrictRedis
+
+sys.path.insert(0, '../')
+import web.settings
 
 logger = logging.getLogger('core')
 
@@ -39,7 +42,7 @@ class EventManager():
 		self.wqueue = self.setup_wqueue()
 
 	def setup_wqueue(self):
-		redis_conn = Redis()
+		redis_conn = StrictRedis(connection_pool=web.settings.REDIS_POOL)
 		return Queue(connection=redis_conn)
 	
 	def consume_queue(self):
