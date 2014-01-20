@@ -39,7 +39,7 @@ def configure_system():
 	install_redis()
 	package_update()
 	package_ensure('curl')
-	package_ensure('asterisk')
+	#package_ensure('asterisk')
 
 # Application stuff
 @task
@@ -55,6 +55,7 @@ def app_environment():
 def python_requisites():
 	# This should be in requisites.txt
 	python_package_ensure_pip('redis')
+	python_package_ensure_pip('hiredis')
 	python_package_ensure_pip('rq')
 	python_package_ensure_pip('Flask')
 
@@ -66,4 +67,4 @@ def prerequisites():
 @task
 def deploy():
 	prerequisites()
-	app_environment()
+	#app_environment()

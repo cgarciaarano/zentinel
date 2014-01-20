@@ -7,6 +7,7 @@ import logging.config
 import os
 import sys
 import redis
+import hiredis
 
 SYSLOG_FACILITY = 'local0'
 INTERNAL_IPS = ('127.0.0.1','192.168.0.96')  # For django debug toolbar
@@ -22,49 +23,19 @@ USE_TZ = True
 ###########                       REDIS CONFIG                              #############
 #########################################################################################
 APP_NAME = 'zentinel'
+
 REDIS_IP = 'localhost'
 REDIS_DB = 1
-REDIS_EQUEUE_IP = 'localhost'
-REDIS_EQUEUE_DB = 2
-REDIS_LT_PREFIX = 'LiveTraffic_{0}*'.format(APP_NAME)
-REDIS_LT_PREFIX_USR = 'User_LiveTraffic_{0}*'.format(APP_NAME)
-REDIS_PUB_SUB = 'LIVE_{0}*'.format(APP_NAME)
-REDIS_PUB_SUB_USR = 'USER_LIVE_{0}*'.format(APP_NAME)
-REDIS_ICX_USAGE = 'Icx_Usage_{0}*'.format(APP_NAME)
-REDIS_CDR_PREFIX = 'CDRCONVERTER_{0}'.format(APP_NAME)
+
+REDIS_EQUEUE_IP = REDIS_IP
+REDIS_EQUEUE_DB = REDIS_DB
+if REDIS_IP in ('localhost','127.0.0.1'):
+	# REDIS_POOL = redis.ConnectionPool(max_connections=500, unix_socket_path='/var/run/redis/redis.sock')
+	REDIS_POOL = redis.ConnectionPool(max_connections=500, host=REDIS_IP, db=REDIS_DB, port=6379)	# TODO Delete
+else:
+	REDIS_POOL = redis.ConnectionPool(max_connections=500, host=REDIS_IP, db=REDIS_DB, port=6379)
+
 CONSUMED_EVENTS = 'CONSUMED_EVENTS'
-
-CHANNEL_GLOBAL_MESSAGES = 'international{0}'.format(APP_NAME)
-CALLS_PROCESSED_JIZO = 'CALLS_PROCESSED_JIZO_{0}'.format(APP_NAME)
-REQUESTS_PROCESSED_JIZO = 'REQUESTS_PROCESSED_JIZO_{0}'.format(APP_NAME)
-
-#########################################################################################
-###########                       REDIS CONFIG                              #############
-#########################################################################################
-
-EXECUTION_HASH_PREFIX = 'EXECUTION_HASH_{0}_'.format(APP_NAME)
-EXECUTION_SKEY_PREFIX = 'EXECUTION_SKEY_{0}_'.format(APP_NAME)
-
-REDIS_POOL = redis.ConnectionPool(max_connections=500, host=REDIS_IP, db=REDIS_DB, port=6379)
-REDIS = redis.Redis(connection_pool=REDIS_POOL)
-REDIS_PUB_SUB = REDIS.pubsub()
-# REDIS_PUB_SUB.psubscribe(REDIS_PUB_SUB_USR)
-
-REDIS_LT_PREFIX = 'LiveTraffic_{0}*'.format(APP_NAME)
-REDIS_LT_PREFIX_USR = 'User_LiveTraffic_{0}*'.format(APP_NAME)
-REDIS_PUB_SUB = 'LIVE_{0}*'.format(APP_NAME)
-REDIS_PUB_SUB_USR = 'USER_LIVE_{0}*'.format(APP_NAME)
-REDIS_ICX_USAGE = 'Icx_Usage_{0}*'.format(APP_NAME)
-REDIS_CDR_PREFIX = 'CDRCONVERTER_{0}'.format(APP_NAME)
-REDIS_ROUTETABLEUTILS_PREFIX = 'ROUTETABLEUTILS_{0}'.format(APP_NAME)
-SCRIPT_STATUS_PREFIX = 'SCRIPTS_STATUS_{0}'.format(APP_NAME)
-ROUTING_RESULT_PREFIX = 'ROUTING_RESULT_{0}|'.format(APP_NAME)
-
-CHANNEL_GLOBAL_MESSAGES = 'international{0}'.format(APP_NAME)
-
-CALLS_PROCESSED_JIZO = 'CALLS_PROCESSED_JIZO_{0}'.format(APP_NAME)
-REQUESTS_PROCESSED_JIZO = 'REQUESTS_PROCESSED_JIZO_{0}'.format(APP_NAME)
-ROUTETABLE_MAX_PROVIDERS = 15
 #########################################################################################
 
 
