@@ -68,3 +68,8 @@ def prerequisites():
 def deploy():
 	prerequisites()
 	#app_environment()
+
+@task
+def provision():
+	configure_system()
+	deploy()
