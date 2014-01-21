@@ -31,6 +31,8 @@ class EventQueue():
 	def __init__(self):
 		self.queue = 'EVENT_QUEUE'
 		self.redis = self.redis_connect()
+
+	def reset_counter(self):
 		self.redis.set(web.settings.CONSUMED_EVENTS,0)
 
 	def redis_connect(self):
@@ -71,10 +73,7 @@ class EventQueue():
 
 	def push_event(self, event):
 		try:
-			rpipe = self.redis.pipeline()
-			rpipe.rpush(self.queue,str(event))
-			rpipe.decr(web.settings.CONSUMED_EVENTS,1) # Decrement in redis the number of NCDRs consumed
-			rpipe.execute()
+			self.redis.rpush(self.queue,str(event))
 			self.current_event = None
 		except redis.ConnectionError:
 			pass

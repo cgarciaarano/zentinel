@@ -21,14 +21,12 @@ import sys
 #import ujson
 from rq import Queue
 from redis import StrictRedis
+from datetime import datetime
 
 sys.path.insert(0, '../')
 import web.settings
 
 logger = logging.getLogger('core')
-
-
-CONSUMED_EVENTS = 'CONSUMED_EVENTS'
 
 
 class EventManager():
@@ -37,6 +35,7 @@ class EventManager():
 	"""
 	def __init__(self):
 		self.equeue = EventQueue()
+		self.equeue.reset_counter()
 		self.current_event = None
 
 		self.wqueue = self.setup_wqueue()
@@ -55,7 +54,7 @@ class EventManager():
 		try:
 			action = self.current_event.get_action()
 
-			logger.info("Event processed in {0} seconds".format(time.time()-t0))
+			logger.info("Action decided in {0} seconds".format(time.time()-t0))
 			logger.debug("Action: {0}".format(action))
 
 			if action:

@@ -23,6 +23,7 @@ import sys
 #import ujson
 from redis import Redis
 import hashlib
+from datetime import datetime
 
 logger = logging.getLogger('core')
 
@@ -94,6 +95,7 @@ def new_event(client_key,message,tag):
 					'message': message,
 					'tag': tag,
 					'ip_addr': request.remote_addr,
+					'reception_date': datetime.utcnow(),
 				}
 
 	(valid,data) = api_manager.handle_event(new_event)				

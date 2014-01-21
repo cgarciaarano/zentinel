@@ -31,8 +31,8 @@ class Event():
 	"""
 	def __init__(self,data):
 		self.id = None
-		self.start_date = datetime.utcnow()
-		self.process_date = None
+		self.reception_date = data['reception_date'] 
+		self.creation_date = datetime.utcnow()
 		self.end_date = None
 		self.client = data['client']
 		self.message = data['message']
@@ -65,13 +65,14 @@ class Action(object):
 	Provides the attribs and public methods execute() and callback()
 	'''
 
-	# Creates attributes from dict and keywords. Flexible but obscure
+	# Creates attributes from dict and keywords. Flexible but obscure. I'm not using it
+	"""
 	def __init__(self, *event_dict, **kwargs):
 		for key in event_dict:
 			setattr(self, key, event_dict[key])
 		for key in kwargs:
 			setattr(self, key, kwargs[key])
-
+	"""
 	def __init__(self, event, params):
 		self.event = event
 		self.action_type = self.__class__.__name__
@@ -87,23 +88,34 @@ class Action(object):
 	def subclass():
 		''' Returns a dict with all subclasses names and instances.
 		P.e. {'SimpleCall': SimpleCall, 'AcknowledgedCall': AcknowledgedCall}.
-		Quite useful when adding Actions ;) '''
+		Quite useful when adding Action subclasses, because you don't need to 
+		change anything, just add the subclass '''
 		return dict((subclass.__name__, subclass) for subclass in Action.__subclasses__())
 
 	def get_data(self):
 		return str(self)		
 
 	def execute(self):
+		result = self.action()
+		self.callback(result)
+
+	def action(self):
 		pass
 
 	def callback(self,result):
+		print 'Callback {0}'.format(result)
+		#self.event['end_date'] = datetime.utcnow()
+		print str(datetime.utcnow())
+		
 		if result:
 			# success
-			pass
+			# self.event.save()
+			print 'Success!'
 		else:
 			# Increment event step
 			self.event.incr_step()
 			
+			print "Push back to EVENT_QUEUE"
 			# Push back on EventQueue
 			q = EventQueue()
 			q.push_event(self.event)
@@ -119,19 +131,21 @@ class SimpleCall(Action):
 	def __init__(self, event, params=None):
 		Action.__init__(self, event, params)
 		self.action_type = self.__class__.__name__
+		self.description = 'Make a call until the called party answers or hung up'
 
-	def execute(self):
+	def action(self):
 		import random
+		result = None
 		# Some blocking execution
 		time.sleep(5)
 		if random.random() > 0.5:
-			print 'True'
+			print 'True - Simple Call'
 			result = True
 		else:
-			print 'False'
+			print 'False - Simple Call'
 			result = False  
 
-		self.callback(result)
+		return result
 
 
 class AcknoweledgedCall(Action):
@@ -143,13 +157,21 @@ class AcknoweledgedCall(Action):
 	def __init__(self, event, params=None):
 		Action.__init__(self, event, params)
 		self.action_type = self.__class__.__name__
+		self.description = 'Make a call until the called party dials the given pin, using DTMF tones'
 
-	def execute(self):
+	def action(self):
+		import random
 		# Some blocking execution
-		time.sleep(10)
-		result = True 
+		result = None
+		time.sleep(5)
+		if random.random() > 0.5:
+			print 'True - ACK Call'
+			result = True
+		else:
+			print 'False - ACK Call'
+			result = False  
 
-		self.callback(result)
+		return result
 
 
 class AnnounceCall(Action):
@@ -159,10 +181,18 @@ class AnnounceCall(Action):
 	def __init__(self, event, params=None):
 		Action.__init__(self, event, params)
 		self.action_type = self.__class__.__name__
+		self.description = 'Make a call until the called party answers. The message in the event is read by a synthetic voice.'
 
-	def execute(self):
+	def action(self):
+		import random
+		result = None
 		# Some blocking execution
-		sys.sleep(10)
-		result = True 
+		time.sleep(5)
+		if random.random() > 0.5:
+			print 'True - Annouce Call'
+			result = True
+		else:
+			print 'False - Annouce Call'
+			result = False  
 
-		self.callback(result)
+		return result
