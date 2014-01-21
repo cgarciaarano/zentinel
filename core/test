@@ -1,0 +1,12 @@
+curl http://127.0.0.1:5000/api/3/hola%20mierder/pr4
+curl http://127.0.0.1:5000/api/2/hola%20mierder/pr4
+curl http://127.0.0.1:5000/api/1/hola%20mierder/pr4
+curl http://127.0.0.1:5000/api/3/hola%20mierder/prw
+curl http://127.0.0.1:5000/api/2/hola%20mierder/pre
+curl http://127.0.0.1:5000/api/1/hola%20mierder/prs
+curl http://127.0.0.1:5000/api/1/hola%20mierder/prw
+curl http://127.0.0.1:5000/api/3/hola%20mierder/pre
+curl http://127.0.0.1:5000/api/2/hola%20mierder/prs
+curl http://127.0.0.1:5000/api/2/hola%20mierder/prw
+curl http://127.0.0.1:5000/api/1/hola%20mierder/pre
+curl http://127.0.0.1:5000/api/1/hola%20mierder/prs
