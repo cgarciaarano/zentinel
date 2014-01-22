@@ -11,8 +11,8 @@ from fabric.colors import red, green
 env.user = 'vagrant'
 env.password = 'vagrant'
 
-PROJECT_ROOT = '/vagrant'
-ENV_ROOT = '/home/vagrant'
+PROJECT_ROOT = '/vagrant/'
+ENV_ROOT = '/home/vagrant/'
 
 users = {	'cgarcia':'cgarcia',
 			'jvizcaino':'jvizcaino',
@@ -45,12 +45,12 @@ def configure_system():
 @task
 def app_environment():
 	# BROKEN
-	# Dont work in Windows
+	# Don't work in Vagrant Windows 
 	# with cd(PROJECT_ROOT):
 		if not dir_exists('{0}/env/'.format(ENV_ROOT)):
 			sudo('wget https://raw.github.com/pypa/virtualenv/1.9.X/virtualenv.py')
-			sudo('python virtualenv.py {0}/env/'.format(ENV_ROOT))
-			sudo('env/bin/pip install -r {0}/requirements.txt'.format(PROJECT_ROOT))
+			sudo('python virtualenv.py {0}env/'.format(ENV_ROOT))
+			sudo('env/bin/pip install -r {0}requirements.txt'.format(PROJECT_ROOT))
 
 def python_requisites():
 	with mode_sudo():
