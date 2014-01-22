@@ -22,41 +22,32 @@ class Event():
 	Represents a client event
 	"""
 
-	"""
-	def __init__(self, *event_dict, **kwargs):
-		for key in event_dict:
-			setattr(self, key, event_dict[key])
+	def __init__(self, event_dict, **kwargs):
+		for key,value in event_dict.iteritems():
+			setattr(self, key, value)
 		for key in kwargs:
 			setattr(self, key, kwargs[key])
-	"""
-	def __init__(self,data):
-		self.id = None
-		self.reception_date = data['reception_date'] 
-		self.creation_date = datetime.utcnow()
-		self.end_date = None
-		self.client = data['client']
-		self.message = data['message']
-		self.ip_addr = data['ip_addr']
-		self.tag = data['tag']
-		self.step = 1
 
 	def __str__(self):
 		return str(self.__dict__)
 
 	def get_data(self):
-		return str(self)		
+		return self.__dict__		
 
 	def get_action(self):
-		# Check some service or whatever
+		# TODO Check some service or whatever
 		# (action_type,params) = getActionTypeForThisEvent(self)
 		(action_type,params) = ('SimpleCall',{'ddi':695624167,'cli':666666666,'retries':3})
 		# Create object of type 'action_type'
-		action = Action.subclass()[action_type](self,params)
+		action = Action.subclass()[action_type](self.get_data(),params)
 
 		return action
 
 	def incr_step(self):
 		self.step += 1
+
+	def save(self):
+		print 'Event saved: {0}'.format(self)
 
 
 class Action(object):
@@ -73,8 +64,9 @@ class Action(object):
 		for key in kwargs:
 			setattr(self, key, kwargs[key])
 	"""
-	def __init__(self, event, params):
-		self.event = event
+	def __init__(self, event_data, params):
+		# FIXME Store an object has no sense, as it's going to be serialized in Redis, losing the reference (see pickle)
+		self.event_data = event_data
 		self.action_type = self.__class__.__name__
 		self.params = params
 
@@ -96,6 +88,7 @@ class Action(object):
 		return str(self)		
 
 	def execute(self):
+		logger.debug('Execution started...')
 		result = self.action()
 		self.callback(result)
 
@@ -104,21 +97,21 @@ class Action(object):
 
 	def callback(self,result):
 		print 'Callback {0}'.format(result)
-		#self.event['end_date'] = datetime.utcnow()
-		print str(datetime.utcnow())
+		self.event_data['end_date'] = datetime.utcnow()
 		
 		if result:
 			# success
-			# self.event.save()
-			print 'Success!'
+			vent = Event(self.event_data)
+			self.event.save()
 		else:
-			# Increment event step
-			self.event.incr_step()
-			
-			print "Push back to EVENT_QUEUE"
+			logger.warning("Action execution failed. Pushing back event to EVENT_QUEUE")
 			# Push back on EventQueue
 			q = EventQueue()
-			q.push_event(self.event)
+			event = Event(self.event_data)
+			# Increment event step
+			event.incr_step()
+			q.push_event(event)
+			#q.push_event(self.event)
 
 # Subclasses
 
@@ -128,8 +121,8 @@ class SimpleCall(Action):
 	Place a call to 'ddi' from 'cli' for 'duration' seconds, and retries 'retries' times
 	Inherits from Action, so execute() and callback() are implemented.
 	"""
-	def __init__(self, event, params=None):
-		Action.__init__(self, event, params)
+	def __init__(self, event_data, params=None):
+		Action.__init__(self, event_data, params)
 		self.action_type = self.__class__.__name__
 		self.description = 'Make a call until the called party answers or hung up'
 
@@ -154,8 +147,8 @@ class AcknoweledgedCall(Action):
 	Place a call to 'ddi' from 'cli' until the called party sends back 'pin' through DTMF, and retries 'retries' times
 	Inherits from Action, so execute() and callback() are implemented.
 	"""
-	def __init__(self, event, params=None):
-		Action.__init__(self, event, params)
+	def __init__(self, event_data, params=None):
+		Action.__init__(self, event_data, params)
 		self.action_type = self.__class__.__name__
 		self.description = 'Make a call until the called party dials the given pin, using DTMF tones'
 
@@ -178,8 +171,8 @@ class AnnounceCall(Action):
 	"""
 	Represents an call through Asterisk that reads the message. 
 	"""
-	def __init__(self, event, params=None):
-		Action.__init__(self, event, params)
+	def __init__(self, event_data, params=None):
+		Action.__init__(self, event_data, params)
 		self.action_type = self.__class__.__name__
 		self.description = 'Make a call until the called party answers. The message in the event is read by a synthetic voice.'
 

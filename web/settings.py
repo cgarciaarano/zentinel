@@ -9,8 +9,9 @@ import sys
 import redis
 import hiredis
 
+DEBUG = True
+
 SYSLOG_FACILITY = 'local0'
-INTERNAL_IPS = ('127.0.0.1','192.168.0.96')  # For django debug toolbar
 
 PROJECT_ROOT = os.path.dirname(__file__)
 sys.path.insert(0, os.path.join(PROJECT_ROOT, "persistent-messages"))
@@ -36,11 +37,25 @@ else:
 	REDIS_POOL = redis.ConnectionPool(max_connections=500, host=REDIS_IP, db=REDIS_DB, port=6379)
 
 CONSUMED_EVENTS = 'CONSUMED_EVENTS'
+
 #########################################################################################
+###########                       RQ CONFIG                                 #############
+#########################################################################################
+RQ_TIMEOUT = 1800
+"""
+RQ_QUEUES = {
+    'default': {
+        'HOST': REDIS_IP,
+        'PORT': 6379,
+        'DB': REDIS_DB,
+        'PASSWORD': '',
+    },
+}
+"""
 
-
-
-
+#########################################################################################
+###########                       LOGGING CONFIG                            #############
+#########################################################################################
 LOGGING = {
 	'version': 1,
 	'disable_existing_loggers': True,
@@ -77,13 +92,3 @@ LOGGING = {
 	}
 }
 logging.config.dictConfig(LOGGING)
-
-
-RQ_QUEUES = {
-    'default': {
-        'HOST': REDIS_IP,
-        'PORT': 6379,
-        'DB': REDIS_DB,
-        'PASSWORD': '',
-    },
-}

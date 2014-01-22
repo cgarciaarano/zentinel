@@ -58,16 +58,16 @@ class EventQueue():
 
 		return rds
 
-
 	def pop_event(self):
 		try:
 			event = self.redis.blpop(self.queue)[1]
 
 			event = eval(event)
+			print event
 			total = self.redis.incr(web.settings.CONSUMED_EVENTS,1) # Increment in redis the number of events consumed 
 			logger.debug("Total events consumed {0}, processing...".format(total))
 		except redis.ConnectionError:
-			pass
+			logger.error('Connection error in Redis popping event')
 
 		return models.Event(event)
 
@@ -76,4 +76,4 @@ class EventQueue():
 			self.redis.rpush(self.queue,str(event))
 			self.current_event = None
 		except redis.ConnectionError:
-			pass
+			logger.error('Connection error in Redis pushing event')
