@@ -58,7 +58,7 @@ class EventManager():
 			logger.debug("Action: {0}".format(action))
 
 			if action:
-				self.wqueue.enqueue(action.execute)
+				self.wqueue.enqueue(action.execute,timeout=web.settings.RQ_TIMEOUT,result_ttl=0)
 			else:
 				pass
 				# Log error
@@ -101,8 +101,6 @@ def __signalHandler(signum, frame):
 	finally:
 		logger.info("Exiting now")
 		sys.exit(0)
-
-
 
 if __name__ == '__main__':
 	event_manager = EventManager()
