@@ -58,7 +58,7 @@ class EventManager():
 			logger.debug("Action: {0}".format(action))
 
 			if action:
-				self.wqueue.enqueue(action.execute,timeout=web.settings.RQ_TIMEOUT,result_ttl=0)
+				self.wqueue.enqueue(action.execute)
 			else:
 				pass
 				# Log error

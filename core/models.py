@@ -99,19 +99,19 @@ class Action(object):
 		print 'Callback {0}'.format(result)
 		self.event_data['end_date'] = datetime.utcnow()
 		
+		event = Event(self.event_data)
 		if result:
 			# success
-			vent = Event(self.event_data)
 			self.event.save()
 		else:
 			logger.warning("Action execution failed. Pushing back event to EVENT_QUEUE")
 			# Push back on EventQueue
 			q = EventQueue()
-			event = Event(self.event_data)
+		
 			# Increment event step
-			event.incr_step()
+			# FIXME Fails to execute this function in worker
+			# event.incr_step()
 			q.push_event(event)
-			#q.push_event(self.event)
 
 # Subclasses
 
