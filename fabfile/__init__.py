@@ -53,11 +53,12 @@ def app_environment():
 			sudo('env/bin/pip install -r {0}/requirements.txt'.format(PROJECT_ROOT))
 
 def python_requisites():
-	# This should be in requisites.txt
-	python_package_ensure_pip('redis')
-	python_package_ensure_pip('hiredis')
-	python_package_ensure_pip('rq')
-	python_package_ensure_pip('Flask')
+	with mode_sudo():
+		# This should be in requisites.txt
+		python_package_ensure_pip('redis')
+		python_package_ensure_pip('hiredis')
+		python_package_ensure_pip('rq')
+		python_package_ensure_pip('Flask')
 
 def prerequisites():
 	package_ensure('python-dev')

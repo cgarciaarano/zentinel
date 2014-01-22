@@ -25,6 +25,9 @@ from redis import Redis
 import hashlib
 from datetime import datetime
 
+sys.path.insert(0, '../')
+import web.settings
+
 logger = logging.getLogger('core')
 
 
@@ -43,6 +46,13 @@ class API(object):
 				'3':{'client': 'David', 'service':'AnnounceCall'},
 				}
 
+	def is_client(self,client_key):
+		# TODO Implement this for real
+		if client_key in self.get_clients().keys():
+			return self.get_clients()[client_key]['client']
+		else:
+			return None
+
 	def handle_event(self,data):
 		''' Validates event, and if it's ok creates it and dispatchs
 		Returns:
@@ -50,13 +60,7 @@ class API(object):
 		 * Event or description of rejection. Event or String
 		'''
 		# Validate event
-		
-		# Check client
-		if data['client_key'] in self.get_clients().keys():
-			data['client'] = self.get_clients()[data['client_key']]['client']
-		else:
-			return (False,'Client does not exist')
-		
+				
 		# Make hash
 		hash = hashlib.sha256(str(data)).hexdigest()
 		# Check against self.current_events
@@ -91,11 +95,18 @@ api_server = Flask(__name__)
 
 @api_server.route('/api/<client_key>/<message>/<tag>')
 def new_event(client_key,message,tag):
-	new_event = {	'client_key': client_key,
+	
+	client = api_manager.is_client(client_key)
+	if not client:
+		return make_response(jsonify( {'error': 'Forbbiden', 'description': 'Client does not exist'}),403)
+
+	new_event = {	'client': client,
 					'message': message,
 					'tag': tag,
 					'ip_addr': request.remote_addr,
 					'reception_date': datetime.utcnow(),
+					'execution_date': None,
+					'end_date': None,
 				}
 
 	(valid,data) = api_manager.handle_event(new_event)				
@@ -110,5 +121,4 @@ if __name__ == '__main__':
 	signal.signal(signal.SIGINT, __signalHandler)
 
 	api_manager = API()
-	api_server.run(debug = True)
-
+	api_server.run(debug = web.settings.DEBUG)
