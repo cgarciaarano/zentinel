@@ -14,6 +14,7 @@ import logging
 import time
 from datetime import datetime
 from event_queue import EventQueue
+import hashlib
 
 logger = logging.getLogger('web')
 
@@ -23,6 +24,20 @@ class Event():
 	"""
 
 	def __init__(self, event_dict, **kwargs):
+		"""
+		Creates an object, based in dict passed as parameter. Quite obscure.
+
+		Example dict:
+		event = {	'client': client,
+					'message': message,
+					'tag': tag,
+					'ip_addr': request.remote_addr,
+					'reception_date': datetime.utcnow(),
+					'execution_date': None,
+					'end_date': None,
+					'step':0,
+			}
+		"""
 		for key,value in event_dict.iteritems():
 			setattr(self, key, value)
 		for key in kwargs:
@@ -34,6 +49,11 @@ class Event():
 	def get_data(self):
 		return self.__dict__		
 
+	def get_hash(self):
+		# Get a uniqueid based in some attributes
+		data = ''.join(self.client,self.message,self.tag,self.step)
+		return hashlib.sha256(str(data)).hexdigest()
+
 	def get_action(self):
 		# TODO Check some service or whatever
 		# (action_type,params) = getActionTypeForThisEvent(self)
@@ -43,10 +63,8 @@ class Event():
 
 		return action
 
-	def incr_step(self):
-		self.step += 1
-
 	def save(self):
+		# TODO Implement a real save
 		print 'Event saved: {0}'.format(self)
 
 
@@ -55,18 +73,8 @@ class Action(object):
 	Represents the action taken for a given event. It's an abstract class and should not be instantiated directly.
 	Provides the attribs and public methods execute() and callback()
 	'''
-
-	# Creates attributes from dict and keywords. Flexible but obscure. I'm not using it
-	"""
-	def __init__(self, *event_dict, **kwargs):
-		for key in event_dict:
-			setattr(self, key, event_dict[key])
-		for key in kwargs:
-			setattr(self, key, kwargs[key])
-	"""
 	def __init__(self, event_data, params):
-		# FIXME Store an object has no sense, as it's going to be serialized in Redis, losing the reference (see pickle)
-		self.event_data = event_data
+		self.event_data = event_data # Store a dict instead of object, to allow modification
 		self.action_type = self.__class__.__name__
 		self.params = params
 
@@ -105,12 +113,11 @@ class Action(object):
 			self.event.save()
 		else:
 			logger.warning("Action execution failed. Pushing back event to EVENT_QUEUE")
-			# Push back on EventQueue
+			# Increment event step and create Event
+			self.event_data['step'] += 1
+			event = Event(self.event_data)		
+			# Push back Event on EventQueue
 			q = EventQueue()
-		
-			# Increment event step
-			# FIXME Fails to execute this function in worker
-			# event.incr_step()
 			q.push_event(event)
 
 # Subclasses
