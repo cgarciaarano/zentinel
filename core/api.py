@@ -22,7 +22,6 @@ import traceback
 import sys
 #import ujson
 from redis import Redis
-import hashlib
 from datetime import datetime
 
 sys.path.insert(0, '../')
@@ -54,28 +53,33 @@ class API(object):
 			return None
 
 	def handle_event(self,data):
-		''' Validates event, and if it's ok creates it and dispatchs
+		''' Validates event, and if it's ok dispatchs
 		Returns:
 		 * Event accepted. Bool
-		 * Event or description of rejection. Event or String
+		 * Description. String
 		'''
 		# Validate event
-				
-		# Make hash
-		hash = hashlib.sha256(str(data)).hexdigest()
+
+		# TODO Check if client has credit and so
+		# if client ok
+		#	go on
+		# else
+		#	return (False, "not enough credit")
+
+		event = Event(data)
+
+		# TODO Better in redis, so we can have several handlers
 		# Check against self.current_events
-		if hash in self.current_events:
+		if event.get_hash() in self.current_events:
 			return (False,'Event repeated')
 		else:
 			# Add to current events
-			self.current_events[hash] = data 
-
-		event = Event(data)
+			self.current_events[event.get_hash()] = event
 
 		# Dispatch event
 		self.equeue.push_event(event)
 
-		return (True,event)
+		return (True,event.get_hash())
 	
 
 	def run(self):
@@ -107,11 +111,12 @@ def new_event(client_key,message,tag):
 					'reception_date': datetime.utcnow(),
 					'execution_date': None,
 					'end_date': None,
+					'step':0,
 				}
 
 	(valid,data) = api_manager.handle_event(new_event)				
 	if valid:
-		return make_response(jsonify( {'event': str(data)} ),200)
+		return make_response(jsonify( {'event_id': str(data)} ),200)
 	else:
 		return make_response(jsonify( {'error': 'Forbbiden', 'description': str(data)}),403)
 	
