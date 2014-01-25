@@ -30,17 +30,26 @@ def install_redis():
 	package_update()
 	package_ensure('redis-server')
 
+def configure_asterisk():
+	with mode_sudo():
+		file_link(PROJECT_ROOT + 'core/actions/zentinel.ael','/etc/asterisk/zentinel.ael',owner='asterisk')
+		file_append('/etc/asterisk/extensions.ael','#include "zentinel.ael"')
+
+
 @task
 def setup_system():
 	addUsers()
 
 @task
 def configure_system():
-	install_redis()
-	package_update()
-	package_ensure('curl')
-	#package_ensure('asterisk')
-
+	with mode_sudo():
+		install_redis()
+		package_update()
+		package_ensure('vim')
+		package_ensure('curl')
+		package_ensure('asterisk')
+		configure_asterisk()
+		
 # Application stuff
 @task
 def app_environment():
