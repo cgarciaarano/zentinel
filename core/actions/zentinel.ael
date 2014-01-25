@@ -1,0 +1,20 @@
+context from-zentinel {
+	_X. => {
+		NoOp(Zentinel: Outgoing call to ${EXTEN});
+		Answer();
+		MAXTRIES=3;
+		CUR_TRY=1;
+		while (${CUR_TRY} < ${MAXTRIES})
+		{
+			Dial(SIP/7791${EXTEN}@ONO1,${DIALTIMEOUT},10,g);
+			Noop(Hangup code: ${HANGUPCAUSE});
+			if ("${DIALSTATUS}" = "ANSWER" ){
+				break;
+			}
+			if ("${DIALSTATUS}" = "BUSY" ){
+				break;
+			}
+			Wait(15);
+		}
+	}
+}

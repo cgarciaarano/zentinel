@@ -3,4 +3,4 @@ apt-get update
 apt-get install -y -q python-pip python-dev
 pip install fabric cuisine
 
-#fab deploy -H localhost
+fab deploy -H localhost
