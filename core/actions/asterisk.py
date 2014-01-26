@@ -122,10 +122,10 @@ class AsteriskAMI(object):
 		# Setting vars for request
 		variables = 'variable=DDI={0},'.format(params['ddi']) +\
 					'CLI={0},'.format(params['cli']) +\
-					'DURATION={0},'.format(params['duration']) +\
+					'DURATION=10,' +\
 					'RETRIES={0}'.format(params['retries'])
 		timeout = 'data=1'
-		
+
 		request = '&'.join([SIMPLE_CALL_REQUEST,timeout,variables])
 
 		return self.sendCall(request)
