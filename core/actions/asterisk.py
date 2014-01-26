@@ -16,6 +16,7 @@ Copyright (c) 2010 Pogona. All rights reserved.
 """
 
 import httplib
+import urllib
 import logging
 import logging.handlers
 import xml.dom.minidom
@@ -32,13 +33,12 @@ logger = logging.getLogger('core')
 # Session cookie specification
 COOKIE_NAME = "mansession_id"
 
-TIMEOUT = 5
-
-# Request the channel list, possible values: /rawman, /mxml, /manager
+# Interface possible values: /rawman, /mxml, /manager
 # Possible actions and responses: http://www.voip-info.org/wiki/view/Asterisk+manager+API
-LOGIN_REQUEST = "/asterisk/manager?action=Login&username={0}&secret={1}"
-LOGOFF_REQUEST = "/asterisk/manager?action=Logoff"
-CALL_REQUEST = "/asterisk/mxml?action=originate&channel=Local/666666@from-zentinel extension zentinel@from-zentinel"
+LOGIN_REQUEST = "/manager?action=Login&username={0}&secret={1}"
+LOGOFF_REQUEST = "/manager?action=Logoff"
+SIMPLE_CALL_REQUEST = "/mxml?action=originate&channel=Local/666666@from-zentinel&application=Wait"
+ANNOUNCE_CALL_REQUEST = "/mxml?action=originate&channel=Local/666666@from-zentinel&extension=123&context=announce-call&priority=1"
 
 
 # Defines a C-like struct for Servers
@@ -64,6 +64,7 @@ class AsteriskAMI(object):
 			return {"Cookie" : COOKIE_NAME + "=" + cookieValue }
 		except:
 			logger.error("Cannot get HTTP headers. Authentication failed!")
+			raise Exception
 
 	# Definition of asterisk servers to be monitored and database server
 	def initServers(self):
@@ -71,40 +72,77 @@ class AsteriskAMI(object):
 			self.astServersList.append(AstServer(host=server['host'],port=server['port'],user=server['user'],passwd=server['passwd']))
 		logger.info("Servers initialized")
 
-
-	def simpleCall(self,params):
+	def handle_response(self,response):
 		success = False
-		
-		ddi = params['ddi']
-		cli = params['cli']
-		duration = params['duration']
-		retries = params['retries']
+		logger.debug('Handling response...')
+		try:
+			xmldoc = response.read()
+			xmldoc = xmldoc.rstrip("\r\n ")
+			xml_response = xml.dom.minidom.parseString(xmldoc)
+			logger.debug(xml_response.toprettyxml())
+			if xml_response.getElementsByTagName("generic")[0].attributes["response"].value == "Success":
+				success = True
+		except:
+			logger.error("Response handling failed. Response: ".format(xmldoc ) )
+		finally:
+			logger.debug('Returning {0}'.format(success))
+			return success
+
+	def sendCall(self,request):
+		success = False
 
 		for astServer in self.astServersList:
 			#Authenticates to the server prior to sending the requests
-			logger.debug("Trying HTTP connection to AMI {0}".format(astServer))
+			logger.info("Trying HTTP connection to AMI {0}".format(astServer))
 			conn = httplib.HTTPConnection(astServer.host,port=astServer.port)
 			try:
-				logger.debug("Logging in...")
+				logger.debug('Login Request: ' + LOGIN_REQUEST.format(astServer.user,astServer.passwd) )
 				conn.request("GET",LOGIN_REQUEST.format(astServer.user,astServer.passwd))
 				response = conn.getresponse()
+				logger.debug('Login Response: {0}'.format(response.read() ) )
 				logger.debug("Getting auth cookie...")
 				auth_cookie = self.getAuthCookie(response)
 			except Exception:
-				logger.warning("Cannot connect to Asterisk server " + astServer.host)
-				raise
-				conn.close()
+				logger.error("Cannot connect to Asterisk server {0}".format(astServer.host))
+				break # Pass to next server, or return false
 			else:
-				logger.debug("Connected to Asterisk server " + astServer.host)
-				conn.request('GET', CALL_REQUEST, None, auth_cookie)
-				logger.debug("Call request made")
+				logger.info("Connected to Asterisk server {0}".format(astServer.host))
+				conn.request('GET', request, None, auth_cookie)
+				logger.debug("Call request made. Request: {0}".format(request) )
 				response = conn.getresponse()
-				logger.debug("Call placed: " + str(response.read()))
-				#TODO Handle response
-				success = True
+				#Handle response
+				success = self.handle_response(response)
 				break
+			finally:
+				logger.info("Disconnecting from Asterisk server {0}".format(astServer.host))
+				conn.close()
+		return success
 
-			return success
+	def simpleCall(self,params):
+		# Setting vars for request
+		variables = 'variable=DDI={0},'.format(params['ddi']) +\
+					'CLI={0},'.format(params['cli']) +\
+					'DURATION={0},'.format(params['duration']) +\
+					'RETRIES={0}'.format(params['retries'])
+		timeout = 'data=1'
+		
+		request = '&'.join([SIMPLE_CALL_REQUEST,timeout,variables])
+
+		return self.sendCall(request)
+
+
+	def announceCall(self,params):
+		# Setting vars for request
+		variables =	'variable=DDI={0},'.format(params['ddi']) +\
+					'CLI={0},'.format(params['cli']) +\
+					'MESSAGE="{0}",'.format(params['message']) +\
+					'DURATION={0},'.format(params['duration']) +\
+					'RETRIES={0}'.format(params['retries'])
+		timeout = 'data={0}'.format(params['duration'])
+
+		request = '&'.join([ANNOUNCE_CALL_REQUEST,timeout,variables])
+
+		return self.sendCall(request)
 
 # Handles the TERM signal (triggered by keyboard or kill command)
 def signalHandler(signum, frame):
@@ -118,9 +156,11 @@ if __name__ == '__main__':
 	ami = AsteriskAMI()
 	
 	data = {}
-	data['ddi'] = 123
-	data['cli'] = 214125
-	data['duration'] = 30
+	data['ddi'] = 695624167
+	data['cli'] = 666666666
+	data['duration'] = 100
 	data['retries'] = 1
+	#data['message'] = urllib.quote_plus('Hello Charles')
+	data['message'] = urllib.quote_plus("Pacific Rim is a 2013 American science fiction monster film directed by Guillermo del Toro, written by del Toro and Travis Beacham, and starring Charlie Hunnam, Idris Elba, Rinko Kikuchi, Charlie Day, Robert Kazinsky, Max Martini, and Ron Perlman. The film is set in the 2020s, when Earth is at war with the Kaijus,[note1 1] colossal monsters which have emerged from an interdimensional portal on the floor of the Pacific Ocean. To combat the monsters, humanity unites to create the Jaegers [note2 1] : gigantic humanoid mecha, each controlled by at least two pilots, whose minds are joined by a neural bridge. Focusing on the war's later days, the story follows Raleigh Becket, a washed-up Jaeger pilot called out of retirement and teamed with rookie pilot Mako Mori as part of a last-ditch effort to defeat the Kaijus.")
 	
 	ami.simpleCall(data)
