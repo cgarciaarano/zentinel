@@ -1,0 +1,7 @@
+* Asterisk requests should be POSTs, urlencode!
+* Add asterisk provision to fabric
+	* sip.conf (Be careful)
+	* extensions.conf
+	* manager.conf
+	* http.conf
+* Sanitize params to action in asterisk.py
