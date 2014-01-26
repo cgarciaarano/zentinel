@@ -58,7 +58,7 @@ RQ_QUEUES = {
 ASTERISK_AMI_SERVERS = [ {	'host':'localhost',
 							'port':8088,
 							'user':'zentinel',
-							'passwd':'F34t!-Twef235'} ]
+							'passwd':'tweetmary'} ]
 
 #########################################################################################
 ###########                       LOGGING CONFIG                            #############

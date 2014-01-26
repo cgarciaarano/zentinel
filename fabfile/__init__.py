@@ -32,9 +32,21 @@ def install_redis():
 
 def configure_asterisk():
 	with mode_sudo():
+		configure_tts()
+
 		file_link(PROJECT_ROOT + 'core/actions/zentinel.ael','/etc/asterisk/zentinel.ael',owner='asterisk')
 		file_append('/etc/asterisk/extensions.ael','#include "zentinel.ael"')
 
+def configure_tts():
+	package_ensure('sox')
+	package_ensure('mpg123')
+	package_ensure('perl')
+	package_ensure('libwww-perl')
+
+	run('wget https://github.com/zaf/asterisk-googletts/archive/v0.6.tar.gz')
+	run('tar xzvf v0.6.tar.gz')
+	run('mv asterisk-googletts-0.6/googletts.agi /usr/share/asterisk/agi-bin')
+	dir_remove('v0.6.tar.gz')
 
 @task
 def setup_system():
