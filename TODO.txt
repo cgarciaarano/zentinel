@@ -5,3 +5,4 @@
 	* manager.conf
 	* http.conf
 * Sanitize params to action in asterisk.py
+* Configure Asterisk at home
