@@ -139,7 +139,6 @@ class SimpleCall(Action):
 		result = None
 		# Some blocking execution
 		ami = asterisk.AsteriskAMI()
-		print str(params)
 		result = ami.simpleCall(self.params)
 		
 		return result
