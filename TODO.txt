@@ -1,4 +1,4 @@
-* Asterisk requests should be POSTs, urlencode!
+* Asterisk requests should be POSTs, urlencode! (Not really needed)
 * Add asterisk provision to fabric
 	* sip.conf (Be careful)
 	* extensions.conf
