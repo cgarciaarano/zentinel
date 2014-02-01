@@ -31,6 +31,15 @@ class Action(object):
 	def __str__(self):
 		return str(self.__dict__)
 
+	def init_attrbs(attrbs,values):
+		for attr in attrs:
+			if attr in values.keys():
+				setattr(self, attr, values[attr])
+			else:
+				logger.critical("Action can't be created. Missing attribute {0}".format(attr))
+				return False
+		return True
+
 	def get_type(self):
 		return self.action_type
 
@@ -78,16 +87,22 @@ class SimpleCall(Action):
 	Place a call to 'ddi' from 'cli' for 'duration' seconds, and retries 'retries' times
 	Inherits from Action, so execute() and callback() are implemented.
 	"""
-	def __init__(self, event_data):
+	def __init__(self, event_data,values):
 		Action.__init__(self, event_data)
 		self.action_type = self.__class__.__name__
 		self.description = 'Make a call until the called party answers or hung up'
 
+		# List of attributes for this kind of action
+		attrs = ['ddi','cli','retries','duration']
+
+		if not self.init_attrbs(attrs,values):
+			return None
+
 	def action(self):
+		logger.debug("Executing Simple Call Action")
 		result = None
-		# Some blocking execution
 		ami = asterisk.AsteriskAMI()
-		result = ami.simpleCall(self.params)
+		result = ami.simple_call(ddi=self.ddi, cli=self.cli, retries=self.retries, duration=self.duration)
 		
 		return result
 
@@ -103,8 +118,19 @@ class AcknoweledgedCall(Action):
 		self.action_type = self.__class__.__name__
 		self.description = 'Make a call until the called party dials the given pin, using DTMF tones'
 
+		# List of attributes for this kind of action
+		attrs = ['ddi','cli','retries','duration','pin','lang']
+
+		if not self.init_attrbs(attrs,values):
+			return None
+
 	def action(self):
-		pass
+		logger.debug("Executing Acknowledged Call Action")
+		result = None
+		ami = asterisk.AsteriskAMI()
+		result = ami.acknowledged_call(ddi=self.ddi, cli=self.cli, retries=self.retries, duration=self.duration)
+		
+		return result
 
 
 class AnnounceCall(Action):
@@ -116,5 +142,17 @@ class AnnounceCall(Action):
 		self.action_type = self.__class__.__name__
 		self.description = 'Make a call until the called party answers. The message in the event is read by a synthetic voice.'
 
+		# List of attributes for this kind of action
+		attrs = ['ddi','cli','retries','lang','message']
+
+		if not self.init_attrbs(attrs,values):
+			return None
+
+
 	def action(self):
-		pass
+		logger.debug("Executing Announce Call Action")
+		result = None
+		ami = asterisk.AsteriskAMI()
+		result = ami.announce_call(ddi=self.ddi, cli=self.cli, retries=self.retries, duration=self.duration, lang=self.lang, message=self.message)
+		
+		return result

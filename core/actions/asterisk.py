@@ -42,17 +42,17 @@ ANNOUNCE_CALL_REQUEST = "/mxml?action=originate&channel=Local/666666@from-zentin
 
 
 # Defines a C-like struct for Servers
-class AstServer:	
+class AsteriskServer:	
   def __init__(self,**kwds):
 	self.__dict__.update(kwds)
 
 class AsteriskAMI(object):
 	def __init__(self):
-		self.astServersList = []
-		self.initServers()
+		self.AsteriskServersList = []
+		self.init_servers()
 
 	# Gets the authentication cookie
-	def getAuthCookie(self,response):
+	def get_auth_cookie(self,response):
 		# Get headers and cookie value
 		try:
 			head = response.getheaders()
@@ -67,9 +67,9 @@ class AsteriskAMI(object):
 			raise Exception
 
 	# Definition of asterisk servers to be monitored and database server
-	def initServers(self):
+	def init_servers(self):
 		for server in web.settings.ASTERISK_AMI_SERVERS:
-			self.astServersList.append(AstServer(host=server['host'],port=server['port'],user=server['user'],passwd=server['passwd']))
+			self.AsteriskServersList.append(AsteriskServer(host=server['host'],port=server['port'],user=server['user'],passwd=server['passwd']))
 		logger.info("Servers initialized")
 
 	def handle_response(self,response):
@@ -88,25 +88,25 @@ class AsteriskAMI(object):
 			logger.debug('Returning {0}'.format(success))
 			return success
 
-	def sendCall(self,request):
+	def send_call(self,request):
 		success = False
 
-		for astServer in self.astServersList:
+		for AsteriskServer in self.AsteriskServersList:
 			#Authenticates to the server prior to sending the requests
-			logger.info("Trying HTTP connection to AMI {0}".format(astServer))
-			conn = httplib.HTTPConnection(astServer.host,port=astServer.port)
+			logger.info("Trying HTTP connection to AMI {0}".format(AsteriskServer))
+			conn = httplib.HTTPConnection(AsteriskServer.host,port=AsteriskServer.port)
 			try:
-				logger.debug('Login Request: ' + LOGIN_REQUEST.format(astServer.user,astServer.passwd) )
-				conn.request("GET",LOGIN_REQUEST.format(astServer.user,astServer.passwd))
+				logger.debug('Login Request: ' + LOGIN_REQUEST.format(AsteriskServer.user,AsteriskServer.passwd) )
+				conn.request("GET",LOGIN_REQUEST.format(AsteriskServer.user,AsteriskServer.passwd))
 				response = conn.getresponse()
 				logger.debug('Login Response: {0}'.format(response.read() ) )
 				logger.debug("Getting auth cookie...")
-				auth_cookie = self.getAuthCookie(response)
+				auth_cookie = self.get_auth_cookie(response)
 			except Exception:
-				logger.error("Cannot connect to Asterisk server {0}".format(astServer.host))
+				logger.error("Cannot connect to Asterisk server {0}".format(AsteriskServer.host))
 				break # Pass to next server, or return false
 			else:
-				logger.info("Connected to Asterisk server {0}".format(astServer.host))
+				logger.info("Connected to Asterisk server {0}".format(AsteriskServer.host))
 				conn.request('GET', request, None, auth_cookie)
 				logger.debug("Call request made. Request: {0}".format(request) )
 				response = conn.getresponse()
@@ -114,11 +114,11 @@ class AsteriskAMI(object):
 				success = self.handle_response(response)
 				break
 			finally:
-				logger.info("Disconnecting from Asterisk server {0}".format(astServer.host))
+				logger.info("Disconnecting from Asterisk server {0}".format(AsteriskServer.host))
 				conn.close()
 		return success
 
-	def simpleCall(self,params):
+	def simple_call(self,params):
 		# Setting vars for request
 		variables = 'variable=DDI={0},'.format(params['ddi']) +\
 					'CLI={0},'.format(params['cli']) +\
@@ -128,10 +128,10 @@ class AsteriskAMI(object):
 
 		request = '&'.join([SIMPLE_CALL_REQUEST,timeout,variables])
 
-		return self.sendCall(request)
+		return self.send_call(request)
 
 
-	def announceCall(self,params):
+	def announce_call(self,params):
 		# Setting vars for request
 		variables =	'variable=DDI={0},'.format(params['ddi']) +\
 					'CLI={0},'.format(params['cli']) +\
@@ -142,7 +142,21 @@ class AsteriskAMI(object):
 
 		request = '&'.join([ANNOUNCE_CALL_REQUEST,timeout,variables])
 
-		return self.sendCall(request)
+		return self.send_call(request)
+
+	def acknowledged_call(self,params):
+		# Setting vars for request
+		variables =	'variable=DDI={0},'.format(params['ddi']) +\
+					'CLI={0},'.format(params['cli']) +\
+					'MESSAGE="{0}",'.format(params['message']) +\
+					'DURATION={0},'.format(params['duration']) +\
+					'RETRIES={0}'.format(params['retries'])
+		timeout = 'data={0}'.format(params['duration'])
+
+		request = '&'.join([ANNOUNCE_CALL_REQUEST,timeout,variables])
+
+		return self.send_call(request)
+
 
 # Handles the TERM signal (triggered by keyboard or kill command)
 def signalHandler(signum, frame):
@@ -163,4 +177,4 @@ if __name__ == '__main__':
 	#data['message'] = urllib.quote_plus('Hello Charles')
 	data['message'] = urllib.quote_plus("Pacific Rim is a 2013 American science fiction monster film directed by Guillermo del Toro, written by del Toro and Travis Beacham, and starring Charlie Hunnam, Idris Elba, Rinko Kikuchi, Charlie Day, Robert Kazinsky, Max Martini, and Ron Perlman. The film is set in the 2020s, when Earth is at war with the Kaijus,[note1 1] colossal monsters which have emerged from an interdimensional portal on the floor of the Pacific Ocean. To combat the monsters, humanity unites to create the Jaegers [note2 1] : gigantic humanoid mecha, each controlled by at least two pilots, whose minds are joined by a neural bridge. Focusing on the war's later days, the story follows Raleigh Becket, a washed-up Jaeger pilot called out of retirement and teamed with rookie pilot Mako Mori as part of a last-ditch effort to defeat the Kaijus.")
 	
-	ami.simpleCall(data)
+	ami.simple_call(data)
