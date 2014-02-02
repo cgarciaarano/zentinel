@@ -57,6 +57,7 @@ class Action(object):
 
 	def execute(self):
 		logger.debug('Execution started...')
+		self.event_data['execution_date'] = datetime.utcnow()
 		result = self.action()
 		self.callback(result)
 
@@ -64,18 +65,15 @@ class Action(object):
 		pass
 
 	def callback(self,result):
-		print 'Callback {0}'.format(result)
 		self.event_data['end_date'] = datetime.utcnow()
-		
+		self.event_data['step'] += 1
 		event = Event.from_dict(self.event_data)
 		if result:
-			# success
-			self.event.save()
+			# success 
+			# event.save()
+			pass
 		else:
 			logger.warning("Action execution failed. Pushing back event to EVENT_QUEUE")
-			# Increment event step and create Event
-			self.event_data['step'] += 1
-			event = Event.from_dict(self.event_data)		
 			# Push back Event on EventQueue
 			q = EventQueue()
 			q.push_event(event)
@@ -114,7 +112,7 @@ class AcknoweledgedCall(Action):
 	Place a call to 'ddi' from 'cli' until the called party sends back 'pin' through DTMF, and retries 'retries' times
 	Inherits from Action, so execute() and callback() are implemented.
 	"""
-	def __init__(self, event_data):
+	def __init__(self, event_data, values):
 		Action.__init__(self, event_data)
 		self.action_type = self.__class__.__name__
 		self.description = 'Make a call until the called party dials the given pin, using DTMF tones'
@@ -138,13 +136,13 @@ class AnnounceCall(Action):
 	"""
 	Represents an call through Asterisk that reads the message. 
 	"""
-	def __init__(self, event_data):
+	def __init__(self, event_data, values):
 		Action.__init__(self, event_data)
 		self.action_type = self.__class__.__name__
 		self.description = 'Make a call until the called party answers. The message in the event is read by a synthetic voice.'
 
 		# List of attributes for this kind of action
-		attrs = ['ddi','cli','retries','lang','message']
+		attrs = ['ddi','cli','retries','lang','message','duration']
 
 		if not self.init_attrbs(attrs, values):
 			return None
