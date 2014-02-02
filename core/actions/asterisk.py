@@ -85,7 +85,7 @@ class AsteriskAMI(object):
 		except:
 			logger.error("Response handling failed. Response: ".format(xmldoc ) )
 		finally:
-			logger.debug('Returning {0}'.format(success))
+			logger.debug('Asterisk response successful. return {0}'.format(success))
 			return success
 
 	def send_call(self,request):
@@ -131,12 +131,13 @@ class AsteriskAMI(object):
 		return self.send_call(request)
 
 
-	def announce_call(self, ddi, cli, duration, retries, message ):
+	def announce_call(self, ddi, cli, duration, retries, message , lang):
 		# Setting vars for request
 		variables =	'variable=DDI={0},'.format(ddi) +\
 					'CLI={0},'.format(cli) +\
-					'MESSAGE="{0}",'.format(message) +\
-					'DURATION={0},'.format(duration) +\
+					'MESSAGE="{0}",'.format(urllib.quote_plus(message)) +\
+					'DURATION=60,'.format(duration) +\
+					'LANG={0},'.format(lang) +\
 					'RETRIES={0}'.format(retries)
 		timeout = 'data={0}'.format(duration)
 
@@ -144,12 +145,13 @@ class AsteriskAMI(object):
 
 		return self.send_call(request)
 
-	def acknowledged_call(self, ddi, cli, duration, retries, message):
+	def acknowledged_call(self, ddi, cli, duration, retries, message, lang):
 		# Setting vars for request
 		variables =	'variable=DDI={0},'.format(ddi) +\
 					'CLI={0},'.format(cli) +\
-					'MESSAGE="{0}",'.format(message) +\
-					'DURATION={0},'.format(duration) +\
+					'MESSAGE="{0}",'.format(urllib.quote_plus(message)) +\
+					'DURATION=60,'.format(duration) +\
+					'LANG={0},'.format(lang) +\
 					'RETRIES={0}'.format(retries)
 		timeout = 'data={0}'.format(duration)
 

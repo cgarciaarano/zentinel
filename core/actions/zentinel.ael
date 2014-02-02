@@ -5,6 +5,7 @@ context from-zentinel {
 		Noop(Retries: ${RETRIES});
 		Noop(Message: ${MESSAGE});
 		Noop(Duration: ${DURATION});
+		Noop(Language: ${LANG});
 		Set(TIMEOUT(absolute)=${DURATION});
 		DIALTIMEOUT=45;
 		CUR_TRY=0;
@@ -32,7 +33,7 @@ context announce-call {
 		Noop(Announce call: ${MESSAGE});
 		Set(TIMEOUT(absolute)=${DURATION});
 		Wait(1);
-		Agi(googletts.agi,"${MESSAGE}",en);
+		Agi(googletts.agi,"${MESSAGE}",${LANG});
 		Hangup(16);
 	}
 }

@@ -45,7 +45,7 @@ class EventManager():
 		redis_conn = StrictRedis(connection_pool=web.settings.REDIS_POOL)
 		# Creates sync queue if Debug=True
 		wq = Queue(connection=redis_conn,async=not(web.settings.DEBUG))
-		wq = Queue(connection=redis_conn,async=True)
+		#wq = Queue(connection=redis_conn,async=True)
 		return wq 
 	
 	def consume_queue(self):
@@ -88,7 +88,7 @@ class EventManager():
 	def get_action(self):
 		# TODO Check some service or whatever
 		# (action_type,params) = getActionTypeForThisEvent(self)
-		(action_type,params) = ('SimpleCall',{'ddi':695624167,'cli':666666666,'retries':3,'duration':1})
+		(action_type,params) = ('AnnounceCall',{'ddi':695624167,'cli':666666666,'retries':3,'duration':1,'lang':'es','message':'Lucía es la más bonita del mundo!'})
 		# Create object of type 'action_type'
 		action = actions.Action.subclass()[action_type](self.current_event.get_data(),params)
 

@@ -4,5 +4,6 @@
 	* extensions.conf
 	* manager.conf
 	* http.conf
-* Sanitize params to action in asterisk.py
+* Sanitize params to action in asterisk.py DONE
 * Configure Asterisk at home
+* Caching! Flask cache...
