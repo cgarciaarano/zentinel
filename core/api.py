@@ -12,7 +12,7 @@ Rest API
 """
 
 from flask import Flask,render_template,jsonify,make_response,request
-from models import Event
+from zen_event import Event
 from event_queue import EventQueue
 from optparse import OptionParser
 import time
@@ -66,9 +66,12 @@ class API(object):
 		# else
 		#	return (False, "not enough credit")
 
-		event = Event(data)
+		event = Event(	client = data['client'],\
+						message = data['message'],\
+						tag = data['tag'],\
+						ip_addr = data['ip_addr']	)
 
-		# TODO Better in redis, so we can have several handlers
+		# TODO Better store current_events in redis, so we can have several handlers
 		# Check against self.current_events
 		if event.get_hash() in self.current_events:
 			return (False,'Event repeated')
@@ -108,10 +111,6 @@ def new_event(client_key,message,tag):
 					'message': message,
 					'tag': tag,
 					'ip_addr': request.remote_addr,
-					'reception_date': datetime.utcnow(),
-					'execution_date': None,
-					'end_date': None,
-					'step':0,
 				}
 
 	(valid,data) = api_manager.handle_event(new_event)				

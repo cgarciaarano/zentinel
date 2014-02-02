@@ -13,7 +13,8 @@ Action classes
 import logging
 import time
 from datetime import datetime
-from ..event_queue import EventQueue
+from event_queue import EventQueue
+from zen_event import Event
 import hashlib
 import asterisk
 
@@ -31,7 +32,7 @@ class Action(object):
 	def __str__(self):
 		return str(self.__dict__)
 
-	def init_attrbs(attrbs,values):
+	def init_attrbs(self, attrs, values):
 		for attr in attrs:
 			if attr in values.keys():
 				setattr(self, attr, values[attr])
@@ -66,7 +67,7 @@ class Action(object):
 		print 'Callback {0}'.format(result)
 		self.event_data['end_date'] = datetime.utcnow()
 		
-		event = Event(self.event_data)
+		event = Event.from_dict(self.event_data)
 		if result:
 			# success
 			self.event.save()
@@ -74,7 +75,7 @@ class Action(object):
 			logger.warning("Action execution failed. Pushing back event to EVENT_QUEUE")
 			# Increment event step and create Event
 			self.event_data['step'] += 1
-			event = Event(self.event_data)		
+			event = Event.from_dict(self.event_data)		
 			# Push back Event on EventQueue
 			q = EventQueue()
 			q.push_event(event)
@@ -87,7 +88,7 @@ class SimpleCall(Action):
 	Place a call to 'ddi' from 'cli' for 'duration' seconds, and retries 'retries' times
 	Inherits from Action, so execute() and callback() are implemented.
 	"""
-	def __init__(self, event_data,values):
+	def __init__(self, event_data, values):
 		Action.__init__(self, event_data)
 		self.action_type = self.__class__.__name__
 		self.description = 'Make a call until the called party answers or hung up'
@@ -95,7 +96,7 @@ class SimpleCall(Action):
 		# List of attributes for this kind of action
 		attrs = ['ddi','cli','retries','duration']
 
-		if not self.init_attrbs(attrs,values):
+		if not self.init_attrbs(attrs, values):
 			return None
 
 	def action(self):
@@ -121,7 +122,7 @@ class AcknoweledgedCall(Action):
 		# List of attributes for this kind of action
 		attrs = ['ddi','cli','retries','duration','pin','lang']
 
-		if not self.init_attrbs(attrs,values):
+		if not self.init_attrbs(attrs, values):
 			return None
 
 	def action(self):
@@ -145,7 +146,7 @@ class AnnounceCall(Action):
 		# List of attributes for this kind of action
 		attrs = ['ddi','cli','retries','lang','message']
 
-		if not self.init_attrbs(attrs,values):
+		if not self.init_attrbs(attrs, values):
 			return None
 
 

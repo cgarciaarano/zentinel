@@ -10,12 +10,13 @@ Event Queue
 
 @author Carlos Garcia <cgarciaarano@gmail.com>
 """
-import models
+import zen_event
 import logging
 import sys
 import time
 import redis 
 import datetime
+import traceback	
 
 sys.path.insert(0, '../')
 import web.settings
@@ -65,14 +66,24 @@ class EventQueue():
 			event = eval(event)
 
 			total = self.redis.incr(web.settings.CONSUMED_EVENTS,1) # Increment in redis the number of events consumed 
-			logger.debug("Total events consumed {0}, processing...".format(total))
+			logger.info("Total events consumed {0}, processing...".format(total))
 
-			return models.Event(event)
+			event_object = zen_event.Event.from_dict(event)
+			return event_object
 		except redis.ConnectionError:
 			logger.error('Connection error in Redis popping event')
+		except Exception:
+			logger.error('Unexpected exception. Trying to put data back in queue.')
+			logger.error(traceback.format_exc())
+			try: 
+				self.redis.rpush(self.queue,event)
+				logger.debug('Data pushed back in queue successfully')
+			except Exception:
+				logger.critical("Can't put data back in Redis. Logging data: {0}".format(event))
 
 	def push_event(self, event):
 		try:
 			self.redis.rpush(self.queue,event.get_data())
+			logger.debug('Event pushed in queue successfully')
 		except redis.ConnectionError:
 			logger.error('Connection error in Redis pushing event')

@@ -118,12 +118,12 @@ class AsteriskAMI(object):
 				conn.close()
 		return success
 
-	def simple_call(self,params):
+	def simple_call(self, ddi, cli, duration, retries ):
 		# Setting vars for request
-		variables = 'variable=DDI={0},'.format(params['ddi']) +\
-					'CLI={0},'.format(params['cli']) +\
-					'DURATION=10,' +\
-					'RETRIES={0}'.format(params['retries'])
+		variables = 'variable=DDI={0},'.format(ddi) +\
+					'CLI={0},'.format(cli) +\
+					'DURATION=30,' +\
+					'RETRIES={0}'.format(retries)
 		timeout = 'data=1'
 
 		request = '&'.join([SIMPLE_CALL_REQUEST,timeout,variables])
@@ -131,27 +131,27 @@ class AsteriskAMI(object):
 		return self.send_call(request)
 
 
-	def announce_call(self,params):
+	def announce_call(self, ddi, cli, duration, retries, message ):
 		# Setting vars for request
-		variables =	'variable=DDI={0},'.format(params['ddi']) +\
-					'CLI={0},'.format(params['cli']) +\
-					'MESSAGE="{0}",'.format(params['message']) +\
-					'DURATION={0},'.format(params['duration']) +\
-					'RETRIES={0}'.format(params['retries'])
-		timeout = 'data={0}'.format(params['duration'])
+		variables =	'variable=DDI={0},'.format(ddi) +\
+					'CLI={0},'.format(cli) +\
+					'MESSAGE="{0}",'.format(message) +\
+					'DURATION={0},'.format(duration) +\
+					'RETRIES={0}'.format(retries)
+		timeout = 'data={0}'.format(duration)
 
 		request = '&'.join([ANNOUNCE_CALL_REQUEST,timeout,variables])
 
 		return self.send_call(request)
 
-	def acknowledged_call(self,params):
+	def acknowledged_call(self, ddi, cli, duration, retries, message):
 		# Setting vars for request
-		variables =	'variable=DDI={0},'.format(params['ddi']) +\
-					'CLI={0},'.format(params['cli']) +\
-					'MESSAGE="{0}",'.format(params['message']) +\
-					'DURATION={0},'.format(params['duration']) +\
-					'RETRIES={0}'.format(params['retries'])
-		timeout = 'data={0}'.format(params['duration'])
+		variables =	'variable=DDI={0},'.format(ddi) +\
+					'CLI={0},'.format(cli) +\
+					'MESSAGE="{0}",'.format(message) +\
+					'DURATION={0},'.format(duration) +\
+					'RETRIES={0}'.format(retries)
+		timeout = 'data={0}'.format(duration)
 
 		request = '&'.join([ANNOUNCE_CALL_REQUEST,timeout,variables])
 
