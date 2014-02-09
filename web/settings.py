@@ -44,12 +44,12 @@ CONSUMED_EVENTS = 'CONSUMED_EVENTS'
 RQ_TIMEOUT = 1800
 """
 RQ_QUEUES = {
-    'default': {
-        'HOST': REDIS_IP,
-        'PORT': 6379,
-        'DB': REDIS_DB,
-        'PASSWORD': '',
-    },
+	'default': {
+		'HOST': REDIS_IP,
+		'PORT': 6379,
+		'DB': REDIS_DB,
+		'PASSWORD': '',
+	},
 }
 """
 #########################################################################################
@@ -81,21 +81,34 @@ LOGGING = {
 			'class':'logging.StreamHandler',
 			'formatter': 'verbose'
 		},
-	     'rsyslog1': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.SysLogHandler',
-            'formatter': 'verbose',
-            'facility': SYSLOG_FACILITY,
-            'address': '/dev/log',
-            'filters': []
-        },
+		 'rsyslog0': {
+			'level': 'DEBUG',
+			'class': 'logging.handlers.SysLogHandler',
+			'formatter': 'verbose',
+			'facility': 'local0',
+			'address': '/dev/log',
+			'filters': []
+		},
+		'rsyslog1': {
+			'level': 'DEBUG',
+			'class': 'logging.handlers.SysLogHandler',
+			'formatter': 'verbose',
+			'facility': 'local1',
+			'address': '/dev/log',
+			'filters': []
+		},
 	},
 	'loggers': {
+		"web": {
+			"handlers": ['console',"rsyslog0"],
+			"level": "DEBUG",
+			"progagate": True,
+		},
 		"core": {
-            "handlers": ['console',"rsyslog1"],
-            "level": "DEBUG",
-            "progagate": True,
-        },
+			"handlers": ['console',"rsyslog1"],
+			"level": "DEBUG",
+			"progagate": True,
+		},
 	}
 }
 logging.config.dictConfig(LOGGING)
