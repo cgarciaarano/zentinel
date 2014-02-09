@@ -118,11 +118,11 @@ def new_event(client_key,message,tag):
 		return make_response(jsonify( {'event_id': str(data)} ),200)
 	else:
 		return make_response(jsonify( {'error': 'Forbbiden', 'description': str(data)}),403)
-	
-if __name__ == '__main__':
-	
-	signal.signal(signal.SIGTERM, __signalHandler)
-	signal.signal(signal.SIGINT, __signalHandler)
 
-	api_manager = API()
+signal.signal(signal.SIGTERM, __signalHandler)
+signal.signal(signal.SIGINT, __signalHandler)	
+
+api_manager = API()
+
+if __name__ == '__main__':
 	api_server.run(debug = web.settings.DEBUG)
