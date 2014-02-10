@@ -23,7 +23,7 @@ import sys
 #import ujson
 from redis import Redis
 from datetime import datetime
-from core import api_server
+from core import api_server, core_utils
 
 sys.path.insert(0, '../')
 import web.settings
@@ -36,9 +36,8 @@ CONSUMED_EVENTS = 'CONSUMED_EVENTS'
 class API(object):
 	def __init__(self):
 		self.equeue = EventQueue()
-		self.current_events = {} # Dict to hold the current events, to avoid duplicates	
-		# TODO Implement current_events in redis, so we can run multiple instances
-	
+		self.current_events = core_utils.SharedMem() 
+
 	def get_clients(self):
 		# TODO Implement a real lookup
 		return {'1':{'client': 'Carla', 'service':'SimpleCall'},
@@ -72,13 +71,12 @@ class API(object):
 						tag = data['tag'],\
 						ip_addr = data['ip_addr']	)
 
-		# TODO Better store current_events in redis, so we can have several handlers
 		# Check against self.current_events
-		if event.get_hash() in self.current_events:
+		if self.current_events.is_key(event.get_hash()):
 			return (False,'Event repeated')
 		else:
 			# Add to current events
-			self.current_events[event.get_hash()] = event
+			self.current_events.set(event.get_hash(),event)
 
 		# Dispatch event
 		self.equeue.push_event(event)

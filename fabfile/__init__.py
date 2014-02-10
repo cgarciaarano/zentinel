@@ -123,6 +123,7 @@ def python_requisites():
 		python_package_ensure_pip('hiredis')
 		python_package_ensure_pip('rq')
 		python_package_ensure_pip('Flask')
+		python_package_ensure_pip('Flask-Cache')
 
 def prerequisites():
 	package_ensure('python-dev')
