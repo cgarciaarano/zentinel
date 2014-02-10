@@ -23,6 +23,7 @@ import sys
 #import ujson
 from redis import Redis
 from datetime import datetime
+from core import api_server
 
 sys.path.insert(0, '../')
 import web.settings
@@ -97,9 +98,8 @@ def __signalHandler(signum, frame):
 	sys.exit(0)
 
 
-# Server implementation
-api_server = Flask(__name__)
 
+# Server implementation
 @api_server.route('/api/<client_key>/<message>/<tag>')
 def new_event(client_key,message,tag):
 	
@@ -125,4 +125,5 @@ signal.signal(signal.SIGINT, __signalHandler)
 api_manager = API()
 
 if __name__ == '__main__':
+	api_server = Flask(__name__)
 	api_server.run(debug = web.settings.DEBUG)
