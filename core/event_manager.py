@@ -50,11 +50,10 @@ class EventManager():
 	
 	def consume_queue(self):
 		''' Consumes an event and decides if it should be executed '''
-		
-		t0 = time.time()
 		logger.info("Waiting for events to arrive...")
 		self.current_event = self.equeue.pop_event()
-
+		
+		t0 = time.time()
 		# TODO Max numbers of steps 
 		if self.current_event.step < 3:
 			try:

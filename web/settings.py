@@ -14,19 +14,20 @@ DEBUG = True
 SYSLOG_FACILITY = 'local0'
 
 PROJECT_ROOT = os.path.dirname(__file__)
-sys.path.insert(0, os.path.join(PROJECT_ROOT, "persistent-messages"))
 
 TIME_ZONE = 'Europe/Paris'
 
 USE_TZ = True
 
+APP_NAME = 'zentinel'
+
 #########################################################################################
 ###########                       REDIS CONFIG                              #############
 #########################################################################################
-APP_NAME = 'zentinel'
-
 REDIS_IP = 'localhost'
+REDIS_PORT = 6379
 REDIS_DB = 1
+EXPIRATION = 60
 
 REDIS_EQUEUE_IP = REDIS_IP
 REDIS_EQUEUE_DB = REDIS_DB
@@ -38,6 +39,22 @@ else:
 
 CONSUMED_EVENTS = 'CONSUMED_EVENTS'
 
+#########################################################################################
+###########                       CACHE CONFIG                              #############
+#########################################################################################
+CACHES = {
+	'default': {
+		'CACHE_TYPE': 'redis',
+		'CACHE_KEY_PREFIX': APP_NAME,
+		'CACHE_DEFAULT_TIMEOUT':2,
+		'CACHE_REDIS_HOST':REDIS_IP,
+		'CACHE_REDIS_PORT': REDIS_PORT,
+		'CACHE_REDIS_DB':REDIS_DB,
+		'OPTIONS': {
+			'PARSER_CLASS':'redis.connection.HiredisParser',
+		},
+	},
+}
 #########################################################################################
 ###########                       RQ CONFIG                                 #############
 #########################################################################################

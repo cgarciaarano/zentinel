@@ -18,7 +18,7 @@ from zen_event import Event
 import hashlib
 import asterisk
 
-logger = logging.getLogger('web')
+logger = logging.getLogger('core')
 
 class Action(object):
 	''''
