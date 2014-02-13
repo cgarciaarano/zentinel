@@ -1,7 +1,7 @@
 from app import db
 import hashlib
 import datetime
-from config import IPADDR,PORT
+import settings
 
 class SMS(db.Model):
     __tablename__ = 'sms'

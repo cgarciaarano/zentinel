@@ -10,22 +10,21 @@ Event Manager
 
 @author Carlos Garcia <cgarciaarano@gmail.com>
 """
+import sys
+sys.path.insert(0, '../../')
+
 from zen_event import Event
 from event_queue import EventQueue
+import core_utils
 from actions import actions
-from optparse import OptionParser
+from zentinel import settings
+
 import time
 import logging
 import signal
 import traceback
-import sys
 #import ujson
-from rq import Queue
-from redis import StrictRedis
 from datetime import datetime
-
-sys.path.insert(0, '../')
-import web.settings
 
 logger = logging.getLogger('core')
 
@@ -38,15 +37,7 @@ class EventManager():
 		self.equeue = EventQueue()
 		self.equeue.reset_counter()
 		self.current_event = None
-
-		self.wqueue = self.setup_wqueue()
-
-	def setup_wqueue(self):
-		redis_conn = StrictRedis(connection_pool=web.settings.REDIS_POOL)
-		# Creates sync queue if Debug=True
-		wq = Queue(connection=redis_conn,async=not(web.settings.DEBUG))
-		#wq = Queue(connection=redis_conn,async=True)
-		return wq 
+		self.wqueue = core_utils.WorkerQueue()
 	
 	def consume_queue(self):
 		''' Consumes an event and decides if it should be executed '''

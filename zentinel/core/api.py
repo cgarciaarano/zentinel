@@ -10,28 +10,27 @@ Rest API
 
 @author Carlos Garcia <cgarciaarano@gmail.com>
 """
+import sys
+sys.path.insert(0, '../../')
+
+from zen_event import Event
+from zentinel.core import core_utils, api_server
+
+from event_queue import EventQueue
+
 
 from flask import Flask,render_template,jsonify,make_response,request
-from zen_event import Event
-from event_queue import EventQueue
 from optparse import OptionParser
 import time
 import logging
 import signal
 import traceback
-import sys
 #import ujson
 from redis import Redis
 from datetime import datetime
-from core import api_server, core_utils
-
-sys.path.insert(0, '../')
-import web.settings
 
 logger = logging.getLogger('core')
 
-
-CONSUMED_EVENTS = 'CONSUMED_EVENTS'
 
 class API(object):
 	def __init__(self):
@@ -72,7 +71,7 @@ class API(object):
 						ip_addr = data['ip_addr']	)
 
 		# Check against self.current_events
-		if self.current_events.is_key(event.get_hash()):
+		if self.current_events.exists(event.get_hash()):
 			return (False,'Event repeated')
 		else:
 			# Add to current events
@@ -124,4 +123,4 @@ api_manager = API()
 
 if __name__ == '__main__':
 	api_server = Flask(__name__)
-	api_server.run(debug = web.settings.DEBUG)
+	api_server.run(debug = True)

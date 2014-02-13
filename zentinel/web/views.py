@@ -13,21 +13,6 @@ from datetime import datetime,timedelta
 import logging
 import logging.handlers
 
-# Log configuration
-try:
-					logger = logging.getLogger('flask')
-					handler = logging.StreamHandler(sys.stdout)
-					formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-					#formatter = logging.Formatter('%(levelname)s - %(message)s')
-					handler.setFormatter(formatter)
-
-					logger.addHandler(handler)
-
-					logger.setLevel(logging.DEBUG)
-except:
-				print "Could not start logging system"
-				raise
-
 
 
 
