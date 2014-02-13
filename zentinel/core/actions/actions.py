@@ -10,13 +10,14 @@ Action classes
 
 @author Carlos Garcia <cgarciaarano@gmail.com>
 """
+from event_queue import EventQueue
+from zen_event import Event
+import asterisk
+
 import logging
 import time
 from datetime import datetime
-from event_queue import EventQueue
-from zen_event import Event
 import hashlib
-import asterisk
 
 logger = logging.getLogger('core')
 

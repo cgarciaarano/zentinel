@@ -31,11 +31,14 @@ EXPIRATION = 60
 
 REDIS_EQUEUE_IP = REDIS_IP
 REDIS_EQUEUE_DB = REDIS_DB
-if REDIS_IP in ('localhost','127.0.0.1'):
-	# REDIS_POOL = redis.ConnectionPool(max_connections=500, unix_socket_path='/var/run/redis/redis.sock')
-	REDIS_POOL = redis.ConnectionPool(max_connections=500, host=REDIS_IP, db=REDIS_DB, port=6379)	# TODO Delete
-else:
-	REDIS_POOL = redis.ConnectionPool(max_connections=500, host=REDIS_IP, db=REDIS_DB, port=6379)
+REDIS_EQUEUE_PORT = REDIS_PORT
+# REDIS_POOL = redis.ConnectionPool(max_connections=500, unix_socket_path='/var/run/redis/redis.sock')
+REDIS_EVENT_POOL = redis.ConnectionPool(max_connections=500, host=REDIS_EQUEUE_IP, db=REDIS_EQUEUE_DB, port=REDIS_EQUEUE_PORT)
+
+REDIS_WQUEUE_IP = REDIS_IP
+REDIS_WQUEUE_DB = REDIS_DB
+REDIS_WQUEUE_PORT = REDIS_PORT
+REDIS_WORKER_POOL = redis.ConnectionPool(max_connections=500, host=REDIS_WQUEUE_IP, db=REDIS_WQUEUE_DB, port=REDIS_WQUEUE_PORT)
 
 CONSUMED_EVENTS = 'CONSUMED_EVENTS'
 

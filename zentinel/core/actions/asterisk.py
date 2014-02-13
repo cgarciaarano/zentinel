@@ -14,6 +14,7 @@ Usage: asterisk.py
 Created by Carlos Garcia on 2014-01-25.
 Copyright (c) 2010 Pogona. All rights reserved.
 """
+from zentinel import settings
 
 import httplib
 import urllib
@@ -24,9 +25,6 @@ import time
 import os
 import sys
 import signal
-
-sys.path.insert(0, '../../')
-import web.settings
 
 logger = logging.getLogger('core')
 
@@ -68,7 +66,7 @@ class AsteriskAMI(object):
 
 	# Definition of asterisk servers to be monitored and database server
 	def init_servers(self):
-		for server in web.settings.ASTERISK_AMI_SERVERS:
+		for server in settings.ASTERISK_AMI_SERVERS:
 			self.AsteriskServersList.append(AsteriskServer(host=server['host'],port=server['port'],user=server['user'],passwd=server['passwd']))
 		logger.info("Servers initialized")
 

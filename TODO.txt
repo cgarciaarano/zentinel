@@ -5,3 +5,4 @@
 	* manager.conf
 	* http.conf
 * Caching! Flask cache...
+* Access Redis via unix socket, if Redis is local 
