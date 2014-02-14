@@ -1,10 +1,11 @@
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 from momentjs import momentjs
+sys.path.insert(0, '../')
 
-app = Flask(__name__)
-app.config.from_object('config')
-app.jinja_env.globals['momentjs'] = momentjs
-db = SQLAlchemy(app)
+web = Flask(__name__)
+web.config.from_object('settings')
+web.jinja_env.globals['momentjs'] = momentjs
+db = SQLAlchemy(web)
 
-from app import views, models
+from web import views, models

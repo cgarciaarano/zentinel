@@ -22,6 +22,38 @@ USE_TZ = True
 APP_NAME = 'zentinel'
 
 #########################################################################################
+###########                       WEB CONFIG                              #############
+#########################################################################################
+import os
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+WEB_IPADDR = '172.16.6.9'
+WEB_PORT = 8001
+
+DBDRIVER = 'mysql'
+DBUSER = 'zentinel'
+DBPASSWD = 'flask'
+DBSERVER = 'localhost'
+DBPORT = '3306'
+DBNAME = 'zentinel'
+
+SQLALCHEMY_DATABASE_URI = '{0}://{1}:{2}@{3}:{4}/{5}'.format(DBDRIVER,DBUSER,DBPASSWD,DBSERVER,DBPORT,DBNAME)
+SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_migrations')
+
+SQLALCHEMY_BINDS = {
+	'db1' : SQLALCHEMY_DATABASE_URI,
+	}
+
+
+CSRF_ENABLED = True
+SECRET_KEY = 'you-will-never-guess'
+
+#########################################################################################
+###########                       CORE CONFIG                              #############
+#########################################################################################
+
+
+#########################################################################################
 ###########                       REDIS CONFIG                              #############
 #########################################################################################
 REDIS_IP = 'localhost'

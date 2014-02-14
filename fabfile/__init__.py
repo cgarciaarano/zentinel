@@ -93,7 +93,8 @@ def configure_system():
 		package_update()
 		package_ensure('vim')
 		package_ensure('curl')
-		
+		package_ensure('mysql-server')
+
 		redis.deploy()
 		asterisk.deploy()
 		circus.deploy()
@@ -124,6 +125,8 @@ def python_requisites():
 		python_package_ensure_pip('rq')
 		python_package_ensure_pip('Flask')
 		python_package_ensure_pip('Flask-Cache')
+		python_package_ensure_pip('Flask-SQLAlchemy')
+		python_package_ensure_pip('SQLAlchemy-migrate')
 
 def prerequisites():
 	package_ensure('python-dev')
