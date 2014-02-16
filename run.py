@@ -1,6 +1,6 @@
 #!env/bin/python
-from app import app
-from config import IPADDR,PORT
+from zentinel.web import web
+from zentinel.settings import WEB_IPADDR,WEB_PORT
 
 
-app.run(debug = True,host=IPADDR,port=PORT)
+web.run(debug = True,host=WEB_IPADDR,port=WEB_PORT)
