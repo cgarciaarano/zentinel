@@ -7,7 +7,7 @@ from cuisine import *
 import os
 import sys
 from fabric.colors import red, green
-import circus, redis, asterisk
+import circus, redis, asterisk, mysql
 
 env.user = 'vagrant'
 env.password = 'vagrant'
@@ -36,6 +36,12 @@ def custom_circus():
 	with mode_sudo():
 		file_link(PROJECT_ROOT + 'fabfile/circus/circus.ini','/etc/circus/circus.ini',owner='root')
 		dir_ensure('/var/log/zentinel')
+
+def custom_mysql():
+	with mode_sudo():
+		# Create users
+		# grant all privileges on zentinel.* to zentinel@'%' identified by 'flask';
+		pass
 
 def logs():
 	with mode_sudo():
@@ -93,7 +99,8 @@ def configure_system():
 		package_update()
 		package_ensure('vim')
 		package_ensure('curl')
-		package_ensure('mysql-server')
+
+		mysql.deploy()
 
 		redis.deploy()
 		asterisk.deploy()
@@ -101,6 +108,7 @@ def configure_system():
 		
 		custom_asterisk()
 		custom_circus()
+		custom_mysql()
 
 		configure_web()
 		logs()
@@ -127,10 +135,13 @@ def python_requisites():
 		python_package_ensure_pip('Flask-Cache')
 		python_package_ensure_pip('Flask-SQLAlchemy')
 		python_package_ensure_pip('SQLAlchemy-migrate')
+		python_package_ensure_pip('Flask-WTF')
+		python_package_ensure_pip('MySQL-python')
 
 def prerequisites():
 	package_ensure('python-dev')
 	package_ensure('libevent-dev')
+	package_ensure('libmysqlclient-dev')
 	python_requisites()
 
 @task
