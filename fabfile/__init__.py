@@ -134,7 +134,7 @@ def python_requisites():
 		python_package_ensure_pip('Flask')
 		python_package_ensure_pip('Flask-Cache')
 		python_package_ensure_pip('Flask-SQLAlchemy')
-		python_package_ensure_pip('SQLAlchemy-migrate')
+		python_package_ensure_pip('flask-migrate')
 		python_package_ensure_pip('Flask-WTF')
 		python_package_ensure_pip('MySQL-python')
 
