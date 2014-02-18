@@ -19,9 +19,6 @@ class User(db.Model):
 	creation_date = db.Column(db.DateTime(timezone = True))
 	last_modification = db.Column(db.DateTime(timezone = True))
 	password = db.Column(db.String(128))
-	#pedo = db.Column(db.String(128))
-
-
 
 	def __repr__(self):
 		return '<User {0}>'.format(self.nickname)
