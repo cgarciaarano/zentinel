@@ -136,12 +136,10 @@ def python_requisites():
 		python_package_ensure_pip('Flask-SQLAlchemy')
 		python_package_ensure_pip('flask-migrate')
 		python_package_ensure_pip('Flask-WTF')
-		python_package_ensure_pip('MySQL-python')
 
 def prerequisites():
 	package_ensure('python-dev')
 	package_ensure('libevent-dev')
-	package_ensure('libmysqlclient-dev')
 	python_requisites()
 
 @task

@@ -33,11 +33,11 @@ SECRET_KEY = 'you-will-never-guess'
 WEB_IPADDR = '192.168.1.44'
 WEB_PORT = 8001
 
-DBDRIVER = 'mysql'
-DBUSER = 'zentinel'
-DBPASSWD = 'flask'
+DBDRIVER = 'postgresql'
+DBUSER = 'postgres'
+DBPASSWD = 'sp1d1clippeR!'
 DBSERVER = 'localhost'
-DBPORT = '3306'
+DBPORT = '5432'
 DBNAME = 'zentinel'
 
 SQLALCHEMY_DATABASE_URI = '{0}://{1}:{2}@{3}:{4}/{5}'.format(DBDRIVER,DBUSER,DBPASSWD,DBSERVER,DBPORT,DBNAME)
