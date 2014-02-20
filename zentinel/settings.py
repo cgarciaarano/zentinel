@@ -30,8 +30,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 CSRF_ENABLED = True
 SECRET_KEY = 'you-will-never-guess'
 
-WEB_IPADDR = '192.168.1.44'
-WEB_PORT = 8001
+WEB_IPADDR = 'localhost'
+WEB_PORT = 8080
 
 DBDRIVER = 'postgresql'
 DBUSER = 'postgres'
@@ -44,7 +44,8 @@ SQLALCHEMY_DATABASE_URI = '{0}://{1}:{2}@{3}:{4}/{5}'.format(DBDRIVER,DBUSER,DBP
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_migrations')
 
 SQLALCHEMY_BINDS = {
-	'db1' : SQLALCHEMY_DATABASE_URI,
+	'db_web' : SQLALCHEMY_DATABASE_URI,
+	'db_data' : SQLALCHEMY_DATABASE_URI,
 	}
 
 
@@ -130,7 +131,7 @@ LOGGING = {
 	'disable_existing_loggers': True,
 	'formatters': {
 		'verbose': {
-			'format': '%(asctime)s APP:{0} PID:%(process)s %(filename)s %(funcName)s %(levelname)s %(message)s'.format(APP_NAME)
+			'format': '%(asctime)s PID:%(process)s %(filename)s %(funcName)s %(levelname)s %(message)s'
 		},
 		'simple': {
 			'format': '%(levelname)s %(message)s'
