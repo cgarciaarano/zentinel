@@ -31,10 +31,15 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</a>
-					<a class="brand" href="/">SMS Subscriber</a>
+					<a class="brand" href="/">ZENtinel</a>
 				<ul class="nav">
+						{% if not g.user.is_authenticated() %}
 						<li><a href="{{ url_for('login') }}">Login</a></li>
-</ul>
+						{% endif %}
+						{% if g.user.is_authenticated() %}
+							<li><a href="{{ url_for('logout') }}">Logout</a></li>
+						{% endif %}
+				</ul>
 					<div class="nav-collapse collapse">
 					</div>
 			</div>

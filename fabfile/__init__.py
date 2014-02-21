@@ -136,6 +136,8 @@ def python_requisites():
 		python_package_ensure_pip('Flask-SQLAlchemy')
 		python_package_ensure_pip('flask-migrate')
 		python_package_ensure_pip('Flask-WTF')
+		python_package_ensure_pip('Flask-Login')
+		python_package_ensure_pip('Flask-OpenID')
 
 def prerequisites():
 	package_ensure('python-dev')

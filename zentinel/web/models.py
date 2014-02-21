@@ -26,9 +26,21 @@ class User(db.Model):
 	last_login = db.Column(db.DateTime(timezone = True))
 	creation_date = db.Column(db.DateTime(timezone = True), default = datetime.utcnow)
 	last_modification = db.Column(db.DateTime(timezone = True), onupdate = datetime.utcnow)
-	password = db.Column(db.String(128))
+	#password = db.Column(db.String(128))
 	client_id = db.Column(db.Integer, db.ForeignKey('client.id'))
 	active = db.Column(db.Boolean)
+
+	def is_authenticated(self):
+		return True
+
+	def is_active(self):
+		return self.active
+
+	def is_anonymous(self):
+		return False
+
+	def get_id(self):
+		return unicode(self.id)
 
 	def __repr__(self):
 		return '<User {0}>'.format(self.username)
