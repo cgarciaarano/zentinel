@@ -52,7 +52,7 @@ class WorkerQueue(Queue):
 		logger.debug("Creating WorkerQueue...")
 		redis_conn = redis_connect(settings.REDIS_WORKER_POOL)
 		# Creates sync queue if Debug=True
-		wq = Queue(connection=redis_conn,async=not(settings.DEBUG))
+		Queue.__init__(self, connection=redis_conn,async=not(settings.DEBUG))
 
 class SharedMem():
 	"""

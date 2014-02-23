@@ -80,10 +80,3 @@ def index():
 @web.errorhandler(500)
 def error(error):
 		return make_response(jsonify( { 'error': 'Server error' } ), 500)
-
-
-def createSession():
-	session['sessionID'] = os.urandom(24)
-	session['date_filter'] = 0
-
-
