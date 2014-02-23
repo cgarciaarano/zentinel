@@ -83,7 +83,7 @@ class AsteriskAMI(object):
 		except:
 			logger.error("Response handling failed. Response: ".format(xmldoc ) )
 		finally:
-			logger.debug('Asterisk response successful. return {0}'.format(success))
+			logger.debug('Asterisk response handling successful. Return {0}'.format(success))
 			return success
 
 	def send_call(self,request):

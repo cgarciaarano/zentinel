@@ -18,6 +18,7 @@ from event_queue import EventQueue
 import core_utils
 from actions import actions
 from zentinel import settings
+from zentinel.web import models, db
 
 import time
 import logging
@@ -72,17 +73,27 @@ class EventManager():
 					logger.critical("Could not send data back to queue")
 					logger.critical(traceback.format_exc())
 					sys.exit(-1)
-				
+		else:		
+			logger.debug("Event step exceeded. Discarding event.")
+			# TODO Save discarded event
+		
 		self.current_event = None
 
 	def get_action(self):
 		# TODO Check some service or whatever
-		# (action_type,params) = getActionTypeForThisEvent(self)
-		(action_type,params) = ('AnnounceCall',{'ddi':695624167,'cli':666666666,'retries':3,'duration':1,'lang':'es','message':'Lucía es la más bonita del mundo!'})
-		# Create object of type 'action_type'
-		action = actions.Action.subclass()[action_type](self.current_event.get_data(),params)
+		client_key = self.current_event.client_key
+		tag = self.current_event.tag
+		step = self.current_event.step
+		
+		action_config = models.Client.query.filter(models.Client.client_key == client_key).first().get_action(tag, step) 
+		params = {'ddi':695624167,'cli':666666666,'retries':3,'duration':1,'lang':'es','message':'Lucía es la más bonita del mundo!'}
+		logger.debug('Action Config retrieved: {0}'.format(action_config))
 
-		return action
+		if action_config:
+			# Create object of type 'action_type'
+			action = actions.Action.subclass()[action_config.action_type](self.current_event.get_data(),params)
+
+			return action
 
 	def run(self):
 		while True:

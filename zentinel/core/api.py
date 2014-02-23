@@ -12,9 +12,12 @@ Rest API
 """
 import sys
 sys.path.insert(0, '../../')
+# For Debugginf
+sys.path.insert(0, '/vagrant')
 
 from zen_event import Event
-from zentinel.core import core_utils, api_server
+from zentinel.core import core_utils
+from zentinel.web import models, db
 
 from event_queue import EventQueue
 
@@ -30,7 +33,7 @@ from redis import Redis
 from datetime import datetime
 
 logger = logging.getLogger('core')
-
+api_server = Flask(__name__)
 
 class API(object):
 	def __init__(self):
@@ -38,18 +41,11 @@ class API(object):
 		self.current_events = core_utils.SharedMem() 
 
 	def get_clients(self):
-		# TODO Implement a real lookup
-		return {'1':{'client': 'Carla', 'service':'SimpleCall'},
-				'2':{'client': 'Lucia', 'service':'AcknowledgedCall'},
-				'3':{'client': 'David', 'service':'AnnounceCall'},
-				}
+		return models.Client.query.all()
 
 	def is_client(self,client_key):
-		# TODO Implement this for real
-		if client_key in self.get_clients().keys():
-			return self.get_clients()[client_key]['client']
-		else:
-			return None
+		logger.debug('Checking client with key {0}'.format(client_key))
+		return models.Client.query.filter(models.Client.client_key == client_key).scalar().name
 
 	def handle_event(self,data):
 		''' Validates event, and if it's ok dispatchs
@@ -65,12 +61,13 @@ class API(object):
 		# else
 		#	return (False, "not enough credit")
 
-		event = Event(	client = data['client'],\
+		event = Event(	client_key = data['client_key'],\
 						message = data['message'],\
 						tag = data['tag'],\
 						ip_addr = data['ip_addr']	)
 
 		# Check against self.current_events
+		logger.debug('Checking if event is repeated')
 		if self.current_events.exists(event.get_hash()):
 			return (False,'Event repeated')
 		else:
@@ -78,14 +75,10 @@ class API(object):
 			self.current_events.set(event.get_hash(),event)
 
 		# Dispatch event
+		logger.debug('All tests passed. Dispatching event.')
 		self.equeue.push_event(event)
 
 		return (True,event.get_hash())
-	
-
-	def run(self):
-		while True:
-			self.consume_queue()
 
 
 def __signalHandler(signum, frame):
@@ -102,9 +95,9 @@ def new_event(client_key,message,tag):
 	
 	client = api_manager.is_client(client_key)
 	if not client:
-		return make_response(jsonify( {'error': 'Forbbiden', 'description': 'Client does not exist'}),403)
+		return make_response(jsonify( {'error': 'Forbbiden', 'description': 'Client does not exist'}), 403)
 
-	new_event = {	'client': client,
+	new_event = {	'client_key': client_key,
 					'message': message,
 					'tag': tag,
 					'ip_addr': request.remote_addr,
@@ -112,15 +105,13 @@ def new_event(client_key,message,tag):
 
 	(valid,data) = api_manager.handle_event(new_event)				
 	if valid:
-		return make_response(jsonify( {'event_id': str(data)} ),200)
+		return make_response(jsonify( {'event_id': str(data)} ), 200)
 	else:
-		return make_response(jsonify( {'error': 'Forbbiden', 'description': str(data)}),403)
+		return make_response(jsonify( {'error': 'Forbbiden', 'description': str(data)}), 403)
 
 signal.signal(signal.SIGTERM, __signalHandler)
 signal.signal(signal.SIGINT, __signalHandler)	
-
 api_manager = API()
 
 if __name__ == '__main__':
-	api_server = Flask(__name__)
-	api_server.run(debug = True)
+	api_server.run(debug = True, port = 8888)

@@ -16,8 +16,15 @@ class Client(db.Model):
 
 	def __init__(self):
 		pass
+
 	def __repr__(self):
 		return '<Client {0}>'.format(self.name)
+
+	def get_action(self, tag, step):
+		"""
+		Return the ActionConfig for the given params
+		"""
+		return ActionConfig.query.filter(ActionConfig.tag == tag, ActionConfig.step == step).first()
 		
 class User(db.Model):
 	id = db.Column(db.BigInteger, primary_key = True, unique = True, autoincrement = True)
