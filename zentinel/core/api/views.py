@@ -30,6 +30,17 @@ def new_event(client_key,message,tag):
 	else:
 		return make_response(jsonify( {'error': 'Forbbiden', 'description': str(data)}), 403)
 
+@api_server.errorhandler(500)
+def error(error):
+		return make_response(jsonify( { 'error': 'Server error' } ), 500)
+
+@api_server.errorhandler(403)
+def forbidden(error):
+		return make_response(jsonify( { 'error': 'Forbidden' } ), 404)
+
+@api_server.errorhandler(404)
+def notfound(error):
+		return make_response(jsonify( { 'error': 'URL not found' } ), 404)
 
 def signal_handler(signum, frame):
 

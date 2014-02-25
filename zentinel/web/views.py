@@ -1,4 +1,4 @@
-from flask import render_template,jsonify,make_response,abort,Response,request,session,redirect,flash, g
+from flask import render_template,jsonify,make_response,abort,Response,request,session,redirect,flash,g
 from zentinel.web import web, db, lm, oid
 from zentinel.web.forms import LoginForm
 from flask.ext.login import login_user, logout_user, current_user, login_required

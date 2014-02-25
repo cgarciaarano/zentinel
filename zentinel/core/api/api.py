@@ -14,9 +14,9 @@ from zentinel.web import models, db
 
 class API(object):
 	def __init__(self):
-		logger.debug("Creating API object")
 		self.equeue = event_queue
 		self.current_events = shared_mem
+		logger.debug("API manager created")
 
 	def get_clients(self):
 		return models.Client.query.all()
