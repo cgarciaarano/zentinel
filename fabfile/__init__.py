@@ -29,7 +29,7 @@ def custom_asterisk():
 	with mode_sudo():
 		configure_tts()
 
-		file_link(PROJECT_ROOT + 'core/actions/zentinel.ael','/etc/asterisk/zentinel.ael',owner='asterisk')
+		file_link(PROJECT_ROOT + 'fabfile/asterisk/zentinel.ael','/etc/asterisk/zentinel.ael',owner='asterisk')
 		file_append('/etc/asterisk/extensions.ael','#include "zentinel.ael"')
 
 def custom_circus():
@@ -146,10 +146,7 @@ def prerequisites():
 
 @task
 def deploy():
+	#setup_system()
+	configure_system()
 	prerequisites()
 	#app_environment()
-
-@task
-def provision():
-	configure_system()
-	deploy()
