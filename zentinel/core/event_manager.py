@@ -1,6 +1,4 @@
-#!/usr/bin/env python
 # encoding: utf-8
-
 """
 event_manager.py
 
@@ -10,35 +8,33 @@ Event Manager
 
 @author Carlos Garcia <cgarciaarano@gmail.com>
 """
-import sys
-sys.path.insert(0, '../../')
-
-from zen_event import Event
-from event_queue import EventQueue
-import core_utils
-from actions import actions
 from zentinel import settings
 from zentinel.web import models, db
+from zentinel.core import logger
+from zentinel.core.utils import event_queue, worker_queue
+from zentinel.core.zen_event import Event
+from zentinel.core.actions import actions
 
+import sys
 import time
-import logging
 import signal
 import traceback
 #import ujson
-from datetime import datetime
-
-logger = logging.getLogger('core')
-
 
 class EventManager():
 	"""
 	This class has a EventQueue and consumes it.
 	"""
 	def __init__(self):
-		self.equeue = EventQueue()
+		logger.debug("Creating Event Manager object")
+		self.equeue = event_queue
 		self.equeue.reset_counter()
 		self.current_event = None
-		self.wqueue = core_utils.WorkerQueue()
+		self.wqueue = worker_queue
+
+
+		signal.signal(signal.SIGTERM, self.signal_handler)
+		signal.signal(signal.SIGINT, self.signal_handler)
 	
 	def consume_queue(self):
 		''' Consumes an event and decides if it should be executed '''
@@ -100,29 +96,29 @@ class EventManager():
 			self.consume_queue()
 
 
-def __signalHandler(signum, frame):
+	def signal_handler(self, signum, frame):
 
-	logger.debug("Caught signal" + str(signum))
+		logger.debug("Caught signal" + str(signum))
 
-	try:
-		if event_manager.current_event:
-			logger.error("Signal recived while inserting, sending data back to event queue...")
+		try:
+			if self.current_event:
+				logger.error("Signal recived while inserting, sending data back to event queue...")
 
-			try:
-				event_manager.equeue.push_event(event_manager.current_event)			
-				logger.info("Data succesfully sent back to event queue!")
-			except:
-				logger.error("Can't insert back to event queue")
-				logger.error("Event: {0}".format(event_manager.current_event))
+				try:
+					self.equeue.push_event(self.current_event)			
+					logger.info("Data succesfully sent back to event queue!")
+				except:
+					logger.error("Can't insert back to event queue")
+					logger.error("Event: {0}".format(self.current_event))
 
-	except:
-		logger.debug("Something went wrong {0}".format(traceback.format_exc()))
-	finally:
-		logger.info("Exiting now")
-		sys.exit(0)
+		except:
+			logger.debug("Something went wrong {0}".format(traceback.format_exc()))
+		finally:
+			logger.info("Exiting now")
+			sys.exit(0)
+
+
 
 if __name__ == '__main__':
 	event_manager = EventManager()
-	signal.signal(signal.SIGTERM, __signalHandler)
-	signal.signal(signal.SIGINT, __signalHandler)
 	event_manager.run()

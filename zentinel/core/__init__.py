@@ -1,1 +1,4 @@
-from api import api_server
+#from zentinel import settings
+import logging
+
+logger = logging.getLogger('core')

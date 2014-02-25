@@ -1,7 +1,7 @@
 from zentinel.web import db
 import hashlib
 from datetime import datetime
-import settings
+from zentinel import settings
 
 
 class Client(db.Model):

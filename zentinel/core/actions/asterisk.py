@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# encoding: utf-8
-
 """
 asterisk.py
 
@@ -15,18 +11,13 @@ Created by Carlos Garcia on 2014-01-25.
 Copyright (c) 2010 Pogona. All rights reserved.
 """
 from zentinel import settings
+from zentinel.core import logger
 
 import httplib
 import urllib
-import logging
-import logging.handlers
 import xml.dom.minidom
-import time
-import os
-import sys
 import signal
 
-logger = logging.getLogger('core')
 
 # Session cookie specification
 COOKIE_NAME = "mansession_id"
