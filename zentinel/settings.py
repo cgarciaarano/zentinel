@@ -1,11 +1,9 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # encoding: utf-8
 from logging.handlers import SysLogHandler 
 import logging.config
 
 import os
-import sys
 import redis
 import hiredis
 
@@ -24,7 +22,6 @@ APP_NAME = 'zentinel'
 #########################################################################################
 ###########                       WEB CONFIG                              #############
 #########################################################################################
-import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 CSRF_ENABLED = True
@@ -62,7 +59,8 @@ OPENID_PROVIDERS = [
 #########################################################################################
 ###########                       CORE CONFIG                              #############
 #########################################################################################
-
+API_IPADDR = 'localhost'
+API_PORT = 8000
 
 #########################################################################################
 ###########                       REDIS CONFIG                              #############

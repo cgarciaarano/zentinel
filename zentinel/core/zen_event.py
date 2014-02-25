@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 """
 event.py
 
@@ -10,12 +7,11 @@ Event
 
 @author Carlos Garcia <cgarciaarano@gmail.com>
 """
-import logging
-import time
+from zentinel.core import logger
+
 from datetime import datetime
 import hashlib
 
-logger = logging.getLogger('core')
 
 class Event():
 	"""
@@ -26,6 +22,7 @@ class Event():
 		"""
 		Creates an Event object from parameters
 		"""
+		logger.debug("Creating Event object")
 		self.client_key = client_key
 		self.message = message
 		self.tag = tag

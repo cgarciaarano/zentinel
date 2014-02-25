@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 """
 actions.py
 
@@ -10,16 +7,13 @@ Action classes
 
 @author Carlos Garcia <cgarciaarano@gmail.com>
 """
-from event_queue import EventQueue
-from zen_event import Event
-import asterisk
+from zentinel.core.utils import event_queue
+from zentinel.core.zen_event import Event
+from zentinel.core.actions import asterisk
+from zentinel.core import logger
 
-import logging
-import time
 from datetime import datetime
 import hashlib
-
-logger = logging.getLogger('core')
 
 class Action(object):
 	''''
@@ -76,7 +70,7 @@ class Action(object):
 		else:
 			logger.warning("Action execution failed. Pushing back event to EVENT_QUEUE")
 			# Push back Event on EventQueue
-			q = EventQueue()
+			q = event_queue
 			q.push_event(event)
 
 # Subclasses
