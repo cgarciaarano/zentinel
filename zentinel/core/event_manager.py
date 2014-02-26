@@ -78,7 +78,6 @@ class EventManager():
 		self.current_event = None
 
 	def get_action(self):
-		# TODO Check some service or whatever
 		client_key = self.current_event.client_key
 		tag = self.current_event.tag
 		step = self.current_event.step

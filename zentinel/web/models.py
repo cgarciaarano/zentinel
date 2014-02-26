@@ -53,7 +53,7 @@ class User(db.Model):
 		return '<User {0}>'.format(self.username)
 		
 class DDI(db.Model):
-	number = db.Column(db.Integer, primary_key = True, unique = True)
+	number = db.Column(db.BigInteger, primary_key = True, unique = True)
 	country_code = db.Column(db.Integer, db.ForeignKey('country.code'))
 	client_id = db.Column(db.Integer, db.ForeignKey('client.id'))
 	creation_date = db.Column(db.DateTime(timezone = True), default = datetime.utcnow)
@@ -65,9 +65,53 @@ class Country(db.Model):
 	iso_name = db.Column(db.String(5))
 	numbers = db.relationship('DDI', backref = 'country')
 
+class ActionType(db.Model):
+	id = db.Column(db.BigInteger, primary_key = True, unique=True)
+	action_type = db.Column(db.String(128))
+
 class ActionConfig(db.Model):
 	id = db.Column(db.BigInteger, primary_key = True, unique=True)
 	tag = db.Column(db.String(64), primary_key = True)
 	step = db.Column(db.SmallInteger, primary_key = True)
-	action_type = db.Column(db.String(128)) # Sould be an enum or a Foreing Key
+	action_type_id = db.Column(db.Integer, db.ForeignKey('action_type.id'))
 	client_id = db.Column(db.Integer, db.ForeignKey('client.id'))
+
+class SimpleCallParams(db.Model):
+	id = db.Column(db.BigInteger, primary_key = True, unique=True)
+	action_config = db.relationship('ActionConfig', backref = 'params')
+	ddi = db.Column(db.BigInteger, db.ForeignKey('DDI.number'))
+	cli = db.Column(db.Integer)
+	retries = db.Column(db.SmallInteger)
+
+class AnnouceCallParams(db.Model):
+	id = db.Column(db.BigInteger, primary_key = True, unique=True)
+	action_config = db.relationship('ActionConfig', backref = 'params')
+	ddi = db.Column(db.BigInteger, db.ForeignKey('DDI.number'))
+	cli = db.Column(db.Integer)
+	retries = db.Column(db.SmallInteger)
+	language = db.Column(db.Integer)
+
+class AcknowledgedCallParams(db.Model):
+	id = db.Column(db.BigInteger, primary_key = True, unique=True)
+	action_config = db.relationship('ActionConfig', backref = 'params')
+	ddi = db.Column(db.BigInteger, db.ForeignKey('DDI.number'))
+	cli = db.Column(db.Integer)
+	retries = db.Column(db.SmallInteger)
+	language = db.Column(db.Integer)
+	pin = db.Column(db.SmallInteger)
+
+class SimpleSMSParams(db.Model):
+	id = db.Column(db.BigInteger, primary_key = True, unique=True)
+	action_config = db.relationship('ActionConfig', backref = 'params')
+	ddi = db.Column(db.BigInteger, db.ForeignKey('DDI.number'))
+	cli = db.Column(db.Integer)
+	retries = db.Column(db.SmallInteger)
+	pin = db.Column(db.SmallInteger)
+
+class SimpleEmailParams(db.Model):
+	id = db.Column(db.BigInteger, primary_key = True, unique=True)
+	action_config = db.relationship('ActionConfig', backref = 'params')
+	email = db.Column(db.String(120), unique = True)
+	retries = db.Column(db.SmallInteger)
+	language = db.Column(db.Integer)
+	pin = db.Column(db.SmallInteger)

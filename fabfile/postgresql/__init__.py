@@ -19,11 +19,10 @@ def setup():
 	pass
 
 def prerequisites():
-	python_package_ensure_pip('psycopg2')
+	pass
 
 def install():
 	package_ensure('postgresql')
-	package_ensure('libpq-dev')
 
 def configure():
 	init_service()
