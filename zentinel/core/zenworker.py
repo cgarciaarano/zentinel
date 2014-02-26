@@ -1,10 +1,10 @@
 import sys
+sys.path.append('.')
+
 from rq import Queue, Connection, Worker
 
-
 # Preload libraries
-from zentinal.core import actions, logger
-
+from zentinel.core import actions, logger
 
 # Provide queue names to listen to as arguments to this script,
 # similar to rqworker
