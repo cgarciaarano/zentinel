@@ -8,6 +8,9 @@ Event Manager
 
 @author Carlos Garcia <cgarciaarano@gmail.com>
 """
+import sys
+sys.path.append('.')
+
 from zentinel import settings
 from zentinel.web import models, db
 from zentinel.core import logger
@@ -15,7 +18,6 @@ from zentinel.core.utils import event_queue, worker_queue
 from zentinel.core.zen_event import Event
 from zentinel.core.actions import actions
 
-import sys
 import time
 import signal
 import traceback
