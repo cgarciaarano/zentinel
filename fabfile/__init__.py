@@ -43,6 +43,12 @@ def custom_mysql():
 		# grant all privileges on zentinel.* to zentinel@'%' identified by 'flask';
 		pass
 
+def custom_postgresql():
+	with mode_sudo():
+		# alter user postgres with password 'sp1d1clippeR!';
+		# create database zentinel
+		pass
+	
 def logs():
 	with mode_sudo():
 		puts(green('Configuring zentinel logs...'))
@@ -100,16 +106,17 @@ def configure_system():
 		package_ensure('vim')
 		package_ensure('curl')
 
-		mysql.deploy()
-
+		# Software (role dependant)
+		postgresql.deploy()
 		redis.deploy()
 		asterisk.deploy()
 		circus.deploy()
 		
 		custom_asterisk()
 		custom_circus()
-		custom_mysql()
+		custom_postgresql()
 
+		# System stuff
 		configure_web()
 		logs()
 		logrotate()
@@ -138,10 +145,12 @@ def python_requisites():
 		python_package_ensure_pip('Flask-WTF')
 		python_package_ensure_pip('Flask-Login')
 		python_package_ensure_pip('Flask-OpenID')
+		python_package_ensure_pip('psycopg2')
 
 def prerequisites():
 	package_ensure('python-dev')
 	package_ensure('libevent-dev')
+	package_ensure('libpq-dev')
 	python_requisites()
 
 @task

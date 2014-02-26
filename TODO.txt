@@ -7,5 +7,5 @@
 * Caching! Flask cache...
 * Access Redis via unix socket, if Redis is local 
 * Import settings in fabric and use it
-* EventQueue should be a global objet (in __init__.py ??) 
 * Sanitize message to avoid Asterisk injections.
+* getAction from DB
