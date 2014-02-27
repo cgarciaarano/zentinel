@@ -35,8 +35,8 @@ class EventManager():
 		self.wqueue = worker_queue
 
 
-		signal.signal(signal.SIGTERM, self.signal_handler)
-		signal.signal(signal.SIGINT, self.signal_handler)
+		signal.signal(signal.SIGTERM, self.signal_pushback)
+		signal.signal(signal.SIGINT, self.signal_pushback)
 	
 	def consume_queue(self):
 		''' Consumes an event and decides if it should be executed '''
@@ -97,13 +97,13 @@ class EventManager():
 			self.consume_queue()
 
 
-	def signal_handler(self, signum, frame):
+	def signal_pushback(self, signum, frame):
 
 		logger.debug("Caught signal" + str(signum))
 
 		try:
 			if self.current_event:
-				logger.error("Signal recived while inserting, sending data back to event queue...")
+				logger.error("Signal recieved while inserting, sending data back to event queue...")
 
 				try:
 					self.equeue.push_event(self.current_event)			
