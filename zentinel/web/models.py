@@ -65,53 +65,72 @@ class Country(db.Model):
 	iso_name = db.Column(db.String(5))
 	numbers = db.relationship('DDI', backref = 'country')
 
-class ActionType(db.Model):
-	id = db.Column(db.BigInteger, primary_key = True, unique=True)
-	action_type = db.Column(db.String(128))
-
 class ActionConfig(db.Model):
+	__tablename__ = 'action_config'
+
 	id = db.Column(db.BigInteger, primary_key = True, unique=True)
 	tag = db.Column(db.String(64), primary_key = True)
 	step = db.Column(db.SmallInteger, primary_key = True)
-	action_type_id = db.Column(db.Integer, db.ForeignKey('action_type.id'))
+	action_type = db.Column(db.String(128), nullable = False)	# Discriminator
 	client_id = db.Column(db.Integer, db.ForeignKey('client.id'))
 
-class SimpleCallParams(db.Model):
-	id = db.Column(db.BigInteger, primary_key = True, unique=True)
-	action_config = db.relationship('ActionConfig', backref = 'params')
+	__mapper_args__ = {'polymorphic_on': action_type}
+
+# Actions Models
+class SimpleCallParams(ActionConfig):
+	__tablename__ = 'simple_call_params'
+
+	id = db.Column(db.BigInteger, db.ForeignKey('action_config.id'), primary_key = True)
 	ddi = db.Column(db.BigInteger, db.ForeignKey('DDI.number'))
-	cli = db.Column(db.Integer)
+	cli = db.Column(db.BigInteger)
 	retries = db.Column(db.SmallInteger)
 
-class AnnouceCallParams(db.Model):
-	id = db.Column(db.BigInteger, primary_key = True, unique=True)
-	action_config = db.relationship('ActionConfig', backref = 'params')
+	__mapper_args__ = {'polymorphic_identity': 'SimpleCall',
+						'inherit_condition': (id == ActionConfig.id)}
+
+class AnnouceCallParams(ActionConfig):
+	__tablename__ = 'announce_call_params'
+	id = db.Column(db.BigInteger, db.ForeignKey('action_config.id'), primary_key = True)
 	ddi = db.Column(db.BigInteger, db.ForeignKey('DDI.number'))
 	cli = db.Column(db.Integer)
 	retries = db.Column(db.SmallInteger)
 	language = db.Column(db.Integer)
+	__mapper_args__ = {	'polymorphic_identity': 'AnnouceCall',
+						'inherit_condition': (id == ActionConfig.id)}
 
-class AcknowledgedCallParams(db.Model):
-	id = db.Column(db.BigInteger, primary_key = True, unique=True)
-	action_config = db.relationship('ActionConfig', backref = 'params')
+class AcknowledgedCallParams(ActionConfig):
+	__tablename__ = 'acknowledged_call_params'
+
+	id = db.Column(db.BigInteger, db.ForeignKey('action_config.id'), primary_key = True)
 	ddi = db.Column(db.BigInteger, db.ForeignKey('DDI.number'))
 	cli = db.Column(db.Integer)
 	retries = db.Column(db.SmallInteger)
 	language = db.Column(db.Integer)
 	pin = db.Column(db.SmallInteger)
 
-class SimpleSMSParams(db.Model):
-	id = db.Column(db.BigInteger, primary_key = True, unique=True)
-	action_config = db.relationship('ActionConfig', backref = 'params')
+	__mapper_args__ = {'polymorphic_identity': 'AcknowledgedCall',
+						'inherit_condition': (id == ActionConfig.id)}
+
+class SimpleSMSParams(ActionConfig):
+	__tablename__ = 'simple_sms_params'
+
+	id = db.Column(db.BigInteger, db.ForeignKey('action_config.id'), primary_key = True)
 	ddi = db.Column(db.BigInteger, db.ForeignKey('DDI.number'))
 	cli = db.Column(db.Integer)
 	retries = db.Column(db.SmallInteger)
 	pin = db.Column(db.SmallInteger)
 
-class SimpleEmailParams(db.Model):
-	id = db.Column(db.BigInteger, primary_key = True, unique=True)
-	action_config = db.relationship('ActionConfig', backref = 'params')
+	__mapper_args__ = {'polymorphic_identity': 'SimpleSMS',
+						'inherit_condition': (id == ActionConfig.id)}
+
+class SimpleEmailParams(ActionConfig):
+	__tablename__ = 'simple_email_params'
+
+	id = db.Column(db.BigInteger, db.ForeignKey('action_config.id'), primary_key = True)
 	email = db.Column(db.String(120), unique = True)
 	retries = db.Column(db.SmallInteger)
 	language = db.Column(db.Integer)
 	pin = db.Column(db.SmallInteger)
+
+	__mapper_args__ = {'polymorphic_identity': 'SimpleEmail',
+					'inherit_condition': (id == ActionConfig.id)}	
