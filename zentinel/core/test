@@ -10,3 +10,9 @@ curl http://127.0.0.1:8000/api/2/hola%20mierder/prs
 curl http://127.0.0.1:8000/api/2/hola%20mierder/prw
 curl http://127.0.0.1:8000/api/1/hola%20mierder/pre
 curl http://127.0.0.1:8000/api/1/hola%20mierder/prs
+
+
+from zentinel.web import db, models
+ac = models.ActionConfig(tag='pr3',step=1,action_type='SimpleCall',client_id=2)
+db.session.add(ac)
+db.session.commit()
