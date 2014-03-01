@@ -7,7 +7,7 @@ from cuisine import *
 import os
 import sys
 from fabric.colors import red, green
-import circus, redis, asterisk, mysql
+import circus, redis, asterisk, mysql, postgresql
 
 env.user = 'vagrant'
 env.password = 'vagrant'
@@ -44,10 +44,9 @@ def custom_mysql():
 		pass
 
 def custom_postgresql():
-	with mode_sudo():
-		# alter user postgres with password 'sp1d1clippeR!';
-		# create database zentinel
-		pass
+	sudo('psql -c "{0}"'.format('create database zentinel;'), user='postgres')
+	sudo('psql -c "{0}"'.format('alter user postgres with password \'sp1d1clippeR!\';'), user='postgres')
+	pass
 	
 def logs():
 	with mode_sudo():
