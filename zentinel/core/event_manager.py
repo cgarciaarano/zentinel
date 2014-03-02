@@ -83,7 +83,6 @@ class EventManager():
 		step = self.current_event.step
 		
 		action_config = models.Client.query.filter(models.Client.client_key == client_key).first().get_action(tag, step) 
-		params = {'ddi':695624167,'cli':666666666,'retries':3,'duration':1,'lang':'es','message':'Lucía es la más bonita del mundo!'}
 		logger.debug('Action Config retrieved: {0}'.format(action_config))
 
 		if action_config:
