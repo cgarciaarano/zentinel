@@ -7,7 +7,7 @@ from zentinel import settings
 class Client(db.Model):
 	id = db.Column(db.BigInteger, primary_key = True, unique=True,  autoincrement = True)
 	name = db.Column(db.String(64), index = True)
-	client_key = db.Column(db.String(254), primary_key = True, unique = True)
+	client_key = db.Column(db.String(254), unique = True, index = True)
 	credits = db.Column(db.BigInteger)
 	users = db.relationship('User', backref = 'client')
 	numbers = db.relationship('DDI', backref = 'client')
@@ -24,7 +24,7 @@ class Client(db.Model):
 		"""
 		Return the ActionConfig for the given params
 		"""
-		return ActionConfig.query.filter(ActionConfig.tag == tag, ActionConfig.step == step).first()
+		return ActionConfig.query.filter(ActionConfig.client_id == self.id, ActionConfig.tag == tag, ActionConfig.step == step).first()
 		
 class User(db.Model):
 	id = db.Column(db.BigInteger, primary_key = True, unique = True, autoincrement = True)
@@ -74,7 +74,8 @@ class ActionConfig(db.Model):
 	action_type = db.Column(db.String(128), nullable = False)	# Discriminator
 	client_id = db.Column(db.Integer, db.ForeignKey('client.id'))
 
-	__mapper_args__ = {'polymorphic_on': action_type}
+	__mapper_args__ = {	'polymorphic_on': action_type,
+						'with_polymorphic': '*'}
 
 # Actions Models
 class SimpleCallParams(ActionConfig):
