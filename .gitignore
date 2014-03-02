@@ -18,6 +18,8 @@ parts/
 sdist/
 var/
 .vagrant/
+tmp/
+zentinel/tmp/
 *.egg-info/
 .installed.cfg
 *.egg
