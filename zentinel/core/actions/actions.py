@@ -8,7 +8,6 @@ Action classes
 @author Carlos Garcia <cgarciaarano@gmail.com>
 """
 from zentinel.core.utils import event_queue
-from zentinel.core.zen_event import Event
 from zentinel.core.actions import asterisk
 from zentinel.core import logger
 from zentinel.web import models
@@ -65,7 +64,7 @@ class Action(models.ActionConfig):
 	def callback(self,result):
 		self.event_data['end_date'] = datetime.utcnow()
 		self.event_data['step'] += 1
-		event = Event.from_dict(self.event_data)
+		event = models.Event.from_dict(self.event_data)
 		if result:
 			# success 
 			# event.save()

@@ -8,7 +8,8 @@ Common utilities in core package
 @author Carlos Garcia <cgarciaarano@gmail.com>
 """
 from zentinel import settings
-from zentinel.core import zen_event, logger
+from zentinel.core import logger
+from zentinel.web.models import Event
 
 import logging
 import sys
@@ -121,7 +122,7 @@ class EventQueue(object):
 			total = self.redis.incr(settings.CONSUMED_EVENTS,1) # Increment in redis the number of events consumed 
 			logger.info("Total events consumed {0}, processing...".format(total))
 
-			event_object = zen_event.Event.from_dict(event)
+			event_object = Event.from_dict(event)
 			return event_object
 		except redis.ConnectionError:
 			logger.error('Connection error in Redis popping event.')

@@ -2,6 +2,7 @@ from zentinel.web import db
 import hashlib
 from datetime import datetime
 from zentinel import settings
+from sqlalchemy.dialects import postgresql
 
 
 class Client(db.Model):
@@ -77,6 +78,72 @@ class ActionConfig(db.Model):
 	__mapper_args__ = {	'polymorphic_on': action_type,
 						'with_polymorphic': '*'}
 
+class Event(db.Model):
+	__tablename__ = 'event'
+
+	id = db.Column(db.BigInteger, primary_key = True, unique=True)
+	message = db.Column(db.String(1024))
+	tag = db.Column(db.String(64))
+	step = db.Column(db.SmallInteger)
+	ip_addr = db.Column(postgresql.INET)
+	reception_date = db.Column(db.DateTime(timezone = True))
+	execution_date = db.Column(db.DateTime(timezone = True))
+	end_date = db.Column(db.DateTime(timezone = True))
+	hash = db.Column(db.String(256), index = True)
+	client_id = db.Column(db.Integer, db.ForeignKey('client.id'))
+
+	def __init__(self, client_id, ip_addr, message='', tag=None, reception_date=datetime.utcnow(), execution_date=None, end_date=None, step=0):
+		self.client_id = client_id
+		self.message = message
+		self.tag = tag
+		self.ip_addr = ip_addr
+		self.reception_date = reception_date
+		self.execution_date = execution_date
+		self.end_date = end_date
+		self.step = step
+		self.hash = self.get_hash()
+
+	@classmethod
+	def from_dict(self,data):
+		"""
+		Creates an Event object from dict. Data must be sanitized!
+		Used only when re-creating Event from EventQueue
+		"""
+		attrs = ['client_id', 'message' ,'tag', 'ip_addr', 'reception_date', 'execution_date', 'end_date', 'step']
+		
+		dict_sane = True
+		for attr in attrs:
+			if attr not in data:
+				dict_sane = False
+				break
+
+		if dict_sane:
+			logger.debug("Event generated from dict: {0}".format(self))
+			return Event(
+				client_id = data['client_id'],\
+				message = data['message'],\
+				tag = data['tag'],\
+				ip_addr = data['ip_addr'],\
+				reception_date = data['reception_date'],\
+				execution_date = data['execution_date'],\
+				end_date = data['end_date'],\
+				step = data['step'],\
+				)
+
+	def __str__(self):
+		return str(self.__dict__)
+
+	def get_data(self):
+		return self.__dict__		
+
+	def get_hash(self):
+		# Get a uniqueid based in some attributes
+		data = ''.join([str(self.client_id), self.message, self.tag, str(self.step)])
+		return hashlib.sha256(str(data)).hexdigest()
+
+	def save(self):
+		# TODO Implement a real save
+		print 'Event saved: {0}'.format(self)
 # Actions Models
 class SimpleCallParams(ActionConfig):
 	__tablename__ = 'simple_call_params'

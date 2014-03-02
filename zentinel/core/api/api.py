@@ -7,7 +7,6 @@ Rest API Manager
 
 @author Carlos Garcia <cgarciaarano@gmail.com>
 """
-from zentinel.core.zen_event import Event
 from zentinel.core.utils import  event_queue, shared_mem
 from zentinel.core import logger
 from zentinel.web import models, db
@@ -21,7 +20,7 @@ class API(object):
 	def get_clients(self):
 		return models.Client.query.all()
 
-	def is_client(self,client_key):
+	def is_client(self, client_key):
 		logger.debug('Checking client with key {0}'.format(client_key))
 		return models.Client.query.filter(models.Client.client_key == client_key).scalar()
 
@@ -41,7 +40,7 @@ class API(object):
 		# else
 		#	return (False, "not enough credit")
 
-		event = Event(	client_key = data['client_key'],\
+		event = models.Event(	client_id = client.id,\
 						message = data['message'],\
 						tag = data['tag'],\
 						ip_addr = data['ip_addr']	)
