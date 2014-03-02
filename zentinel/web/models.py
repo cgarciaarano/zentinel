@@ -89,7 +89,7 @@ class SimpleCallParams(ActionConfig):
 	__mapper_args__ = {'polymorphic_identity': 'SimpleCall',
 						'inherit_condition': (id == ActionConfig.id)}
 
-class AnnouceCallParams(ActionConfig):
+class AnnounceCallParams(ActionConfig):
 	__tablename__ = 'announce_call_params'
 	id = db.Column(db.BigInteger, db.ForeignKey('action_config.id'), primary_key = True)
 	ddi = db.Column(db.BigInteger, db.ForeignKey('DDI.number'))

@@ -23,7 +23,7 @@ class API(object):
 
 	def is_client(self,client_key):
 		logger.debug('Checking client with key {0}'.format(client_key))
-		return models.Client.query.filter(models.Client.client_key == client_key).scalar().name
+		return models.Client.query.filter(models.Client.client_key == client_key).scalar()
 
 	def handle_event(self,data):
 		''' Validates event, and if it's ok dispatchs

@@ -1,18 +1,20 @@
-curl http://127.0.0.1:8000/api/3/hola%20mierder/pr4
-curl http://127.0.0.1:8000/api/2/hola%20mierder/pr4
-curl http://127.0.0.1:8000/api/1/hola%20mierder/pr4
-curl http://127.0.0.1:8000/api/3/hola%20mierder/prw
-curl http://127.0.0.1:8000/api/2/hola%20mierder/pre
-curl http://127.0.0.1:8000/api/1/hola%20mierder/prs
-curl http://127.0.0.1:8000/api/1/hola%20mierder/prw
-curl http://127.0.0.1:8000/api/3/hola%20mierder/pre
-curl http://127.0.0.1:8000/api/2/hola%20mierder/prs
-curl http://127.0.0.1:8000/api/2/hola%20mierder/prw
-curl http://127.0.0.1:8000/api/1/hola%20mierder/pre
-curl http://127.0.0.1:8000/api/1/hola%20mierder/prs
+curl http://127.0.0.1:8000/api/3/hola%210mierder/pr3
+curl http://127.0.0.1:8000/api/2/hola%202mierder/pr3
+curl http://127.0.0.1:8000/api/1/hola%20m3ierder/pr3
+curl http://127.0.0.1:8000/api/3/hola%20mi5erder/pr3
+curl http://127.0.0.1:8000/api/2/hola%20mi6erder/pr3
+curl http://127.0.0.1:8000/api/1/hola%20mi7erder/pr3
+curl http://127.0.0.1:8000/api/1/hola%20mi2erder/pr3
+curl http://127.0.0.1:8000/api/3/hola%20mi6erder/pr3
+curl http://127.0.0.1:8000/api/2/hola%20mi7erder/pr3
+curl http://127.0.0.1:8000/api/2/hola%20mi8erder/pr3
+curl http://127.0.0.1:8000/api/1/hola%20mi45erder/pr3
+curl http://127.0.0.1:8000/api/1/hola%20mie5rder/pr3
 
 
 from zentinel.web import db, models
-ac = models.ActionConfig(tag='pr3',step=1,action_type='SimpleCall',client_id=2)
+cl = models.Client.query.get(2)
+
+ac = models.SimpleCallParams(tag='pr3',step=2,action_type='SimpleCall',client_id=2,ddi = 695624167, cli = 555555555, retries = 3)
 db.session.add(ac)
 db.session.commit()

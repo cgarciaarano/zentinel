@@ -87,7 +87,7 @@ class EventManager():
 
 		if action_config:
 			# Create object of type 'action_type'
-			action = actions.Action.subclass()[action_config.action_type](self.current_event.get_data(),params)
+			action = actions.Action.subclass()[action_config.action_type](self.current_event.get_data())
 
 			return action
 
