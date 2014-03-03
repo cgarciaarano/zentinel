@@ -15,7 +15,7 @@ context from-zentinel {
 			Noop(Current try: ${CUR_TRY});
 			CUR_TRY = ${CUR_TRY} + 1;
 			Set(CALLERID(num)=${CLI});
-			Dial(SIP/${DDI}@PBX,${DIALTIMEOUT},10,g);
+			Dial(SIP/${DDI}@CARRIER,${DIALTIMEOUT},10,g);
 			Noop(Hangup code: ${HANGUPCAUSE});
 			if ("${DIALSTATUS}" = "ANSWER" ){
 				break;

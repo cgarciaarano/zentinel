@@ -159,13 +159,3 @@ signal.signal(signal.SIGTERM, signalHandler)
 if __name__ == '__main__':
 	logger.debug("Testing unit")
 	ami = AsteriskAMI()
-	
-	data = {}
-	data['ddi'] = 695624167
-	data['cli'] = 666666666
-	data['duration'] = 100
-	data['retries'] = 1
-	#data['message'] = urllib.quote_plus('Hello Charles')
-	data['message'] = urllib.quote_plus("Pacific Rim is a 2013 American science fiction monster film directed by Guillermo del Toro, written by del Toro and Travis Beacham, and starring Charlie Hunnam, Idris Elba, Rinko Kikuchi, Charlie Day, Robert Kazinsky, Max Martini, and Ron Perlman. The film is set in the 2020s, when Earth is at war with the Kaijus,[note1 1] colossal monsters which have emerged from an interdimensional portal on the floor of the Pacific Ocean. To combat the monsters, humanity unites to create the Jaegers [note2 1] : gigantic humanoid mecha, each controlled by at least two pilots, whose minds are joined by a neural bridge. Focusing on the war's later days, the story follows Raleigh Becket, a washed-up Jaeger pilot called out of retirement and teamed with rookie pilot Mako Mori as part of a last-ditch effort to defeat the Kaijus.")
-	
-	ami.simple_call(data)

@@ -29,8 +29,21 @@ def custom_asterisk():
 	with mode_sudo():
 		configure_tts()
 
+		# Remove files
+		file_unlink('/etc/asterisk/http.conf')
+		file_unlink('/etc/asterisk/manager.conf')
+		file_unlink('/etc/asterisk/sip.conf')
+		file_unlink('/etc/asterisk/extensions.conf')
+
+		# Create links
+		file_link(PROJECT_ROOT + 'fabfile/asterisk/http.conf','/etc/asterisk/http.conf',owner='asterisk')
+		file_link(PROJECT_ROOT + 'fabfile/asterisk/manager.conf','/etc/asterisk/manager.conf',owner='asterisk')
+		file_link(PROJECT_ROOT + 'fabfile/asterisk/sip.conf','/etc/asterisk/sip.conf',owner='asterisk')
+		file_link(PROJECT_ROOT + 'fabfile/asterisk/extensions.conf','/etc/asterisk/extensions.conf',owner='asterisk')
+
 		file_link(PROJECT_ROOT + 'fabfile/asterisk/zentinel.ael','/etc/asterisk/zentinel.ael',owner='asterisk')
 		file_append('/etc/asterisk/extensions.ael','#include "zentinel.ael"')
+
 
 def custom_circus():
 	with mode_sudo():
