@@ -15,7 +15,6 @@ from zentinel import settings
 from zentinel.web import models, db
 from zentinel.core import logger
 from zentinel.core.utils import event_queue, worker_queue
-from zentinel.core.zen_event import Event
 from zentinel.core.actions import actions
 
 import time
@@ -78,11 +77,11 @@ class EventManager():
 		self.current_event = None
 
 	def get_action(self):
-		client_key = self.current_event.client_key
+		client_id = self.current_event.client_id
 		tag = self.current_event.tag
 		step = self.current_event.step
 		
-		action_config = models.Client.query.filter(models.Client.client_key == client_key).first().get_action(tag, step) 
+		action_config = models.Client.query.get(client_id).get_action(tag, step) 
 		logger.debug('Action Config retrieved: {0}'.format(action_config))
 
 		if action_config:

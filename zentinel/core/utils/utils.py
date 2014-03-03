@@ -131,7 +131,7 @@ class EventQueue(object):
 			logger.error('Unexpected exception. Trying to put data back in queue.')
 			logger.error(traceback.format_exc())
 			try: 
-				self.redis.rpush(self.queue,event)
+				self.redis.rpush(self.queue,event.get_data())
 				logger.debug('Data pushed back in queue successfully')
 			except Exception:
 				logger.critical("Can't put data back in Redis. Logging data: {0}".format(event))
@@ -139,6 +139,6 @@ class EventQueue(object):
 	def push_event(self, event):
 		try:
 			self.redis.rpush(self.queue,event.get_data())
-			logger.debug('Event pushed in queue successfully')
+			logger.debug('Event pushed in queue successfully {0}'.format(event.get_data()))
 		except redis.ConnectionError:
 			logger.error('Connection error in Redis pushing event')

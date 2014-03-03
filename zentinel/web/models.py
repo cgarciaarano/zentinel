@@ -1,4 +1,5 @@
 from zentinel.web import db
+from zentinel.core import logger
 import hashlib
 from datetime import datetime
 from zentinel import settings
@@ -92,7 +93,7 @@ class Event(db.Model):
 	hash = db.Column(db.String(256), index = True)
 	client_id = db.Column(db.Integer, db.ForeignKey('client.id'))
 
-	def __init__(self, client_id, ip_addr, message='', tag=None, reception_date=datetime.utcnow(), execution_date=None, end_date=None, step=0):
+	def __init__(self, client_id, ip_addr, message = '', tag = None, step = 1, reception_date = datetime.utcnow(), execution_date = None, end_date = None):
 		self.client_id = client_id
 		self.message = message
 		self.tag = tag
@@ -103,14 +104,16 @@ class Event(db.Model):
 		self.step = step
 		self.hash = self.get_hash()
 
+
 	@classmethod
 	def from_dict(self,data):
 		"""
 		Creates an Event object from dict. Data must be sanitized!
 		Used only when re-creating Event from EventQueue
 		"""
+		# FIXME Ugly workaround to avoid DB object
 		attrs = ['client_id', 'message' ,'tag', 'ip_addr', 'reception_date', 'execution_date', 'end_date', 'step']
-		
+
 		dict_sane = True
 		for attr in attrs:
 			if attr not in data:
@@ -134,7 +137,14 @@ class Event(db.Model):
 		return str(self.__dict__)
 
 	def get_data(self):
-		return self.__dict__		
+		# FIXME Ugly workaround to avoid DB object
+		attrs = ['client_id', 'message' ,'tag', 'ip_addr', 'reception_date', 'execution_date', 'end_date', 'step']
+
+		tmp_dict = {}
+		for attr in attrs:
+			tmp_dict[attr] = self.__dict__[attr]
+		
+		return tmp_dict
 
 	def get_hash(self):
 		# Get a uniqueid based in some attributes
