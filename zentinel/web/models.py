@@ -1,5 +1,6 @@
 from zentinel.web import db
 from zentinel.core import logger
+import uuid
 import hashlib
 from datetime import datetime
 from zentinel import settings
@@ -9,7 +10,7 @@ from sqlalchemy.dialects import postgresql
 class Client(db.Model):
 	id = db.Column(db.BigInteger, primary_key = True, unique=True,  autoincrement = True)
 	name = db.Column(db.String(64), index = True)
-	client_key = db.Column(db.String(254), unique = True, index = True)
+	client_key = db.Column(postgresql.UUID, unique = True, index = True, default = uuid.uuid4, nullable = False)
 	credits = db.Column(db.BigInteger)
 	users = db.relationship('User', backref = 'client')
 	numbers = db.relationship('DDI', backref = 'client')
@@ -104,14 +105,6 @@ class Event(db.Model):
 		self.step = step
 		self.hash = self.get_hash()
 
-	def save(self):
-		try:
-			db.session.add(self)
-			db.session.commit()
-		except:
-			logger.debug("Exception raise saving event {0}. Exception: {1}".format(self, traceback.format_exc()))
-
-
 	@classmethod
 	def from_dict(self,data):
 		"""
@@ -141,7 +134,7 @@ class Event(db.Model):
 				)
 
 	def __str__(self):
-		return str(self.__dict__)
+		return '{0} {1} {2}'.format(self.reception_date, self.message, self.hash)
 
 	def get_data(self):
 		# FIXME Ugly workaround to avoid DB object
@@ -159,8 +152,12 @@ class Event(db.Model):
 		return hashlib.sha256(str(data)).hexdigest()
 
 	def save(self):
-		# TODO Implement a real save
-		print 'Event saved: {0}'.format(self)
+		try:
+			db.session.add(self)
+			db.session.commit()
+		except:
+			logger.debug("Exception raise saving event {0}. Exception: {1}".format(self, traceback.format_exc()))
+
 # Actions Models
 class SimpleCallParams(ActionConfig):
 	__tablename__ = 'simple_call_params'

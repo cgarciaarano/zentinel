@@ -24,7 +24,7 @@ def addUsers():
 	for user,passwd in users.iteritems():
 		user_ensure(user,passwd)
 		group_user_ensure('sudo',user)
-
+@task
 def custom_asterisk():
 	with mode_sudo():
 		configure_tts()
