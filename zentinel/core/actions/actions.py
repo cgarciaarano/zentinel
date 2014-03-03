@@ -66,9 +66,8 @@ class Action(models.ActionConfig):
 		self.event_data['step'] += 1
 		event = models.Event.from_dict(self.event_data)
 		if result:
-			# success 
-			# event.save()
-			pass
+			logger.debug("Action execution success. Saving event.")
+			event.save()
 		else:
 			logger.warning("Action execution failed. Pushing back event to EVENT_QUEUE")
 			# Push back Event on EventQueue

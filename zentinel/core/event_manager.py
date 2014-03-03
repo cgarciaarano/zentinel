@@ -72,7 +72,7 @@ class EventManager():
 					sys.exit(-1)
 		else:		
 			logger.debug("Event step exceeded. Discarding event.")
-			# TODO Save discarded event
+			self.current_event.save()
 		
 		self.current_event = None
 

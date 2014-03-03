@@ -104,6 +104,13 @@ class Event(db.Model):
 		self.step = step
 		self.hash = self.get_hash()
 
+	def save(self):
+		try:
+			db.session.add(self)
+			db.session.commit()
+		except:
+			logger.debug("Exception raise saving event {0}. Exception: {1}".format(self, traceback.format_exc()))
+
 
 	@classmethod
 	def from_dict(self,data):
