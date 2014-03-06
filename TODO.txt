@@ -8,5 +8,6 @@
 * Access Redis via unix socket, if Redis is local 
 * Import settings in fabric and use it
 * Sanitize message to avoid Asterisk injections.
-* Create a Event DB representation
+* Create a Event DB representation, add action_config_id, to know the last action executed. Add status. Invent a way to identify the event sent by the client, not taking into account the step. Anoter hash?
+* Move actions functionality to models... Nope (circular imports!), but copy object
 * Add POST to API

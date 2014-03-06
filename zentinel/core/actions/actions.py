@@ -81,33 +81,34 @@ class ActionCall(Action):
 		self.duration = settings.MAX_CALL_DURATION
 
 
-class SimpleCall(ActionCall, models.SimpleCallParams):
+class SimpleCall(ActionCall):
 	"""
 	Represents a simple call through Asterisk. 
 	Place a call to 'ddi' from 'cli' for 'duration' seconds, and retries 'retries' times
 	Inherits from Action, so execute() and callback() are implemented.
 	"""
-	def __init__(self, event_data):
+	def __init__(self, params, event_data,):
 		ActionCall.__init__(self, event_data)
 		self.action_type = self.__class__.__name__
 		self.description = 'Make a call until the called party answers or hung up'
+		self.params = params
 
 	def action(self):
 		logger.debug("Executing Simple Call Action")
 		result = None
 		ami = asterisk.AsteriskAMI()
-		result = ami.simple_call(ddi = self.ddi, cli = self.cli, retries = self.retries, duration = self.duration)
+		result = ami.simple_call(ddi = self.params.ddi, cli = self.params.cli, retries = self.params.retries, duration = self.duration)
 		
 		return result
 
 
-class AcknoweledgedCall(ActionCall, models.AcknowledgedCallParams):
+class AcknoweledgedCall(ActionCall):
 	"""
 	Represents an acknowledged call through Asterisk. 
 	Place a call to 'ddi' from 'cli' until the called party sends back 'pin' through DTMF, and retries 'retries' times
 	Inherits from Action, so execute() and callback() are implemented.
 	"""
-	def __init__(self, event_data):
+	def __init__(self, params, event_data):
 		ActionCall.__init__(self, event_data)
 		self.action_type = self.__class__.__name__
 		self.description = 'Make a call until the called party dials the given pin, using DTMF tones'
@@ -116,16 +117,16 @@ class AcknoweledgedCall(ActionCall, models.AcknowledgedCallParams):
 		logger.debug("Executing Acknowledged Call Action")
 		result = None
 		ami = asterisk.AsteriskAMI()
-		result = ami.acknowledged_call(ddi = self.ddi, cli = self.cli, retries = self.retries, duration = self.duration)
+		result = ami.acknowledged_call(ddi = self.params.ddi, cli = self.params.cli, retries = self.params.retries, duration = self.duration)
 		
 		return result
 
 
-class AnnounceCall(ActionCall, models.AnnounceCallParams):
+class AnnounceCall(ActionCall):
 	"""
 	Represents an call through Asterisk that reads the message. 
 	"""
-	def __init__(self, event_data):
+	def __init__(self, params, event_data):
 		ActionCall.__init__(self, event_data)
 		self.action_type = self.__class__.__name__
 		self.description = 'Make a call until the called party answers. The message in the event is read by a synthetic voice.'
@@ -135,6 +136,6 @@ class AnnounceCall(ActionCall, models.AnnounceCallParams):
 		logger.debug("Executing Announce Call Action")
 		result = None
 		ami = asterisk.AsteriskAMI()
-		result = ami.announce_call(ddi = self.ddi, cli = self.cli, retries = self.retries, duration = self.duration, lang = self.lang, message = self.message)
+		result = ami.announce_call(ddi = self.params.ddi, cli = self.params.cli, retries = self.params.retries, duration = self.duration, lang = self.params.lang, message = self.params.message)
 		
 		return result
